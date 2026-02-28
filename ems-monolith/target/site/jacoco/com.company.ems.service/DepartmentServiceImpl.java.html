@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DepartmentServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EMS Monolith</a> &gt; <a href="index.source.html" class="el_package">com.company.ems.service</a> &gt; <span class="el_source">DepartmentServiceImpl.java</span></div><h1>DepartmentServiceImpl.java</h1><pre class="source lang-java linenums">package com.company.ems.service;
+
+import com.company.ems.dto.DepartmentRequestDTO;
+import com.company.ems.dto.DepartmentResponseDTO;
+import com.company.ems.dto.DepartmentUpdateRequestDTO;
+import com.company.ems.exception.DepartmentNotFoundException;
+import com.company.ems.model.Department;
+import com.company.ems.repository.DepartmentRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L18">public class DepartmentServiceImpl implements IDepartmentService {</span>
+
+<span class="fc" id="L20">    private static final Logger logger = LoggerFactory.getLogger(DepartmentServiceImpl.class);</span>
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    @Override
+    public DepartmentResponseDTO createDepartment(DepartmentRequestDTO departmentDTO) {
+        try {
+<span class="fc" id="L28">            logger.debug(&quot;Creating department with name: {}&quot;, departmentDTO.getName());</span>
+<span class="fc" id="L29">            Department department = new Department();</span>
+<span class="fc" id="L30">            department.setName(departmentDTO.getName());</span>
+<span class="fc" id="L31">            Department saved = departmentRepository.save(department);</span>
+<span class="fc" id="L32">            logger.info(&quot;Department created successfully with id: {}&quot;, saved.getId());</span>
+<span class="fc" id="L33">            return mapToResponseDTO(saved);</span>
+<span class="fc" id="L34">        } catch (Exception ex) {</span>
+<span class="fc" id="L35">            logger.error(&quot;Error creating department: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L36">            throw ex;</span>
+        }
+    }
+
+    @Override
+    public DepartmentResponseDTO getDepartmentById(Long id) {
+        try {
+<span class="fc" id="L43">            logger.debug(&quot;Fetching department with id: {}&quot;, id);</span>
+<span class="fc" id="L44">            Department department = departmentRepository.findById(id)</span>
+<span class="fc" id="L45">                    .orElseThrow(() -&gt; new DepartmentNotFoundException(&quot;Department not found with id: &quot; + id));</span>
+<span class="fc" id="L46">            logger.info(&quot;Department fetched successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L47">            return mapToResponseDTO(department);</span>
+<span class="fc" id="L48">        } catch (DepartmentNotFoundException ex) {</span>
+<span class="fc" id="L49">            logger.warn(&quot;Department not found with id: {}&quot;, id);</span>
+<span class="fc" id="L50">            throw ex;</span>
+<span class="fc" id="L51">        } catch (Exception ex) {</span>
+<span class="fc" id="L52">            logger.error(&quot;Error fetching department with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L53">            throw ex;</span>
+        }
+    }
+
+    @Override
+    public List&lt;DepartmentResponseDTO&gt; getAllDepartments() {
+        try {
+<span class="fc" id="L60">            logger.debug(&quot;Fetching all departments and sorting using TreeSet&quot;);</span>
+<span class="fc" id="L61">            List&lt;Department&gt; departments = departmentRepository.findAll();</span>
+            
+            // Using TreeSet to demonstrate sorting with Comparable
+<span class="fc" id="L64">            TreeSet&lt;Department&gt; sortedDepartments = new TreeSet&lt;&gt;(departments);</span>
+            
+<span class="fc" id="L66">            List&lt;DepartmentResponseDTO&gt; response = sortedDepartments.stream()</span>
+<span class="fc" id="L67">                    .map(this::mapToResponseDTO)</span>
+<span class="fc" id="L68">                    .collect(Collectors.toList());</span>
+            
+<span class="fc" id="L70">            logger.info(&quot;All departments fetched and sorted successfully - total: {}&quot;, response.size());</span>
+<span class="fc" id="L71">            return response;</span>
+<span class="fc" id="L72">        } catch (Exception ex) {</span>
+<span class="fc" id="L73">            logger.error(&quot;Error fetching all departments: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L74">            throw ex;</span>
+        }
+    }
+
+    @Override
+    public DepartmentResponseDTO updateDepartment(Long id, DepartmentUpdateRequestDTO departmentDTO) {
+        try {
+<span class="fc" id="L81">            logger.debug(&quot;Updating department with id: {}&quot;, id);</span>
+<span class="fc" id="L82">            Department department = departmentRepository.findById(id)</span>
+<span class="fc" id="L83">                    .orElseThrow(() -&gt; new DepartmentNotFoundException(&quot;Department not found with id: &quot; + id));</span>
+<span class="fc" id="L84">            department.setName(departmentDTO.getName());</span>
+<span class="fc" id="L85">            Department updated = departmentRepository.save(department);</span>
+<span class="fc" id="L86">            logger.info(&quot;Department updated successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L87">            return mapToResponseDTO(updated);</span>
+<span class="fc" id="L88">        } catch (DepartmentNotFoundException ex) {</span>
+<span class="fc" id="L89">            logger.warn(&quot;Department not found with id: {}&quot;, id);</span>
+<span class="fc" id="L90">            throw ex;</span>
+<span class="fc" id="L91">        } catch (Exception ex) {</span>
+<span class="fc" id="L92">            logger.error(&quot;Error updating department with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L93">            throw ex;</span>
+        }
+    }
+
+    @Override
+    public void deleteDepartment(Long id) {
+        try {
+<span class="fc" id="L100">            logger.debug(&quot;Deleting department with id: {}&quot;, id);</span>
+<span class="fc" id="L101">            Department department = departmentRepository.findById(id)</span>
+<span class="fc" id="L102">                    .orElseThrow(() -&gt; new DepartmentNotFoundException(&quot;Department not found with id: &quot; + id));</span>
+<span class="fc" id="L103">            departmentRepository.delete(department);</span>
+<span class="fc" id="L104">            logger.info(&quot;Department deleted successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L105">        } catch (DepartmentNotFoundException ex) {</span>
+<span class="fc" id="L106">            logger.warn(&quot;Department not found with id: {}&quot;, id);</span>
+<span class="fc" id="L107">            throw ex;</span>
+<span class="fc" id="L108">        } catch (Exception ex) {</span>
+<span class="fc" id="L109">            logger.error(&quot;Error deleting department with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L110">            throw ex;</span>
+<span class="fc" id="L111">        }</span>
+<span class="fc" id="L112">    }</span>
+
+    private DepartmentResponseDTO mapToResponseDTO(Department department) {
+        try {
+<span class="fc" id="L116">            DepartmentResponseDTO dto = new DepartmentResponseDTO();</span>
+<span class="fc" id="L117">            dto.setId(department.getId());</span>
+<span class="fc" id="L118">            dto.setName(department.getName());</span>
+<span class="fc" id="L119">            return dto;</span>
+<span class="nc" id="L120">        } catch (Exception ex) {</span>
+<span class="nc" id="L121">            logger.error(&quot;Error mapping Department to DepartmentResponseDTO: {}&quot;, ex.getMessage(), ex);</span>
+<span class="nc" id="L122">            throw ex;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

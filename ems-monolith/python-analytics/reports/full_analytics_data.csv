@@ -1,0 +1,43 @@
+id,name,role,salary,joiningDate,department,years_experience,performance_score
+10,Sneha Reddy,HR Executive,50000.0,2023-06-01,HR,3,96
+2,Ravi Kumar,HR Manager,60000.0,2022-01-15,HR,4,78
+1,Ravi Kumar,HR Manager,60000.0,2022-01-15,HR,4,80
+3,Karthik Reddy,Finance Analyst,68000.0,2020-07-20,IT,6,76
+11,Arjun Patel,Cloud Engineer,90000.0,2018-08-14,Finance,8,87
+4,Anjali Sharma,Software Engineer,75000.0,2021-03-10,Finance,5,83
+12,Arjun Patel,Cloud Engineer,90000.0,2018-08-14,Marketing,8,94
+7,Priya Singh,Backend Developer,80000.0,2022-09-18,Marketing,4,93
+9,Meena Iyer,UI/UX Designer,65000.0,2020-05-25,Operations,6,81
+8,Rahul Das,Data Analyst,70000.0,2021-12-05,Operations,5,76
+40,Employee 28,IT Support,71868.0,2012-04-30,IT,14,84
+38,Employee 26,Designer,119561.0,2012-02-29,IT,14,96
+34,Employee 22,Developer,89708.0,2011-10-31,IT,15,85
+27,Employee 15,IT Support,70318.0,2011-03-31,IT,15,79
+26,Employee 14,Manager,101273.0,2011-02-28,IT,15,94
+22,Employee 10,Designer,44419.0,2010-10-31,IT,16,91
+20,Employee 8,Manager,79322.0,2010-08-31,IT,16,80
+19,Employee 7,IT Support,156121.0,2010-07-31,IT,16,71
+18,Employee 6,IT Support,89911.0,2010-06-30,IT,16,71
+17,Employee 5,HR,106241.0,2010-05-31,IT,16,77
+13,Employee 1,Developer,61520.0,2010-01-31,IT,16,79
+41,Employee 29,HR,98805.0,2012-05-31,Management,14,73
+39,Employee 27,HR,108296.0,2012-03-31,Management,14,83
+37,Employee 25,Manager,101435.0,2012-01-31,Management,14,86
+30,Employee 18,Developer,61644.0,2011-06-30,Management,15,90
+21,Employee 9,Manager,43649.0,2010-09-30,Management,16,72
+14,Employee 2,Manager,151166.0,2010-02-28,Management,16,85
+29,Employee 17,Manager,138974.0,2011-05-31,Design,15,90
+28,Employee 16,HR,153985.0,2011-04-30,Design,15,71
+25,Employee 13,IT Support,143349.0,2011-01-31,Design,15,78
+24,Employee 12,Manager,66065.0,2010-12-31,Design,16,82
+23,Employee 11,Manager,61430.0,2010-11-30,Design,16,90
+16,Employee 4,Manager,131297.0,2010-04-30,Design,16,81
+15,Employee 3,HR,155822.0,2010-03-31,Design,16,99
+42,Employee 30,Designer,56486.0,2012-06-30,HR,14,96
+36,Employee 24,HR,43466.0,2011-12-31,HR,15,90
+35,Employee 23,IT Support,114615.0,2011-11-30,HR,15,97
+33,Employee 21,Manager,158185.0,2011-09-30,HR,15,88
+32,Employee 20,Designer,69399.0,2011-08-31,HR,15,79
+31,Employee 19,Developer,88150.0,2011-07-31,HR,15,70
+6,Priya Singh,Backend Developer,80000.0,2022-09-18,Unassigned,4,77
+5,Divya Naidu,Marketing Executive,55000.0,2023-02-01,Unassigned,3,78

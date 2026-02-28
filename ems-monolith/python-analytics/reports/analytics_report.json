@@ -1,0 +1,292 @@
+{
+    "average_salary": {
+        "Design": 121560.28571428571,
+        "Finance": 82500.0,
+        "HR": 77811.22222222222,
+        "IT": 88188.5,
+        "Management": 94165.83333333333,
+        "Marketing": 85000.0,
+        "Operations": 67500.0,
+        "Unassigned": 67500.0
+    },
+    "top_performers": [
+        {
+            "name": "Sneha Reddy",
+            "performance_score": 96
+        },
+        {
+            "name": "Arjun Patel",
+            "performance_score": 94
+        },
+        {
+            "name": "Priya Singh",
+            "performance_score": 93
+        },
+        {
+            "name": "Employee 26",
+            "performance_score": 96
+        },
+        {
+            "name": "Employee 14",
+            "performance_score": 94
+        },
+        {
+            "name": "Employee 10",
+            "performance_score": 91
+        },
+        {
+            "name": "Employee 3",
+            "performance_score": 99
+        },
+        {
+            "name": "Employee 30",
+            "performance_score": 96
+        },
+        {
+            "name": "Employee 23",
+            "performance_score": 97
+        }
+    ],
+    "attrition_risk": [
+        {
+            "name": "Ravi Kumar",
+            "role": "HR Manager"
+        },
+        {
+            "name": "Karthik Reddy",
+            "role": "Finance Analyst"
+        },
+        {
+            "name": "Rahul Das",
+            "role": "Data Analyst"
+        },
+        {
+            "name": "Employee 15",
+            "role": "IT Support"
+        },
+        {
+            "name": "Employee 7",
+            "role": "IT Support"
+        },
+        {
+            "name": "Employee 6",
+            "role": "IT Support"
+        },
+        {
+            "name": "Employee 5",
+            "role": "HR"
+        },
+        {
+            "name": "Employee 1",
+            "role": "Developer"
+        },
+        {
+            "name": "Employee 29",
+            "role": "HR"
+        },
+        {
+            "name": "Employee 9",
+            "role": "Manager"
+        },
+        {
+            "name": "Employee 16",
+            "role": "HR"
+        },
+        {
+            "name": "Employee 13",
+            "role": "IT Support"
+        },
+        {
+            "name": "Employee 20",
+            "role": "Designer"
+        },
+        {
+            "name": "Employee 19",
+            "role": "Developer"
+        },
+        {
+            "name": "Priya Singh",
+            "role": "Backend Developer"
+        },
+        {
+            "name": "Divya Naidu",
+            "role": "Marketing Executive"
+        }
+    ],
+    "salary_regression": {
+        "coefficient": 2905.736716621253,
+        "intercept": 54957.19607175296,
+        "mse": 1132628030.4339316,
+        "r2_score": 0.035302553509230505
+    },
+    "segments": [
+        {
+            "name": "Sneha Reddy",
+            "segment": 0
+        },
+        {
+            "name": "Ravi Kumar",
+            "segment": 2
+        },
+        {
+            "name": "Ravi Kumar",
+            "segment": 2
+        },
+        {
+            "name": "Karthik Reddy",
+            "segment": 2
+        },
+        {
+            "name": "Arjun Patel",
+            "segment": 0
+        },
+        {
+            "name": "Anjali Sharma",
+            "segment": 2
+        },
+        {
+            "name": "Arjun Patel",
+            "segment": 0
+        },
+        {
+            "name": "Priya Singh",
+            "segment": 0
+        },
+        {
+            "name": "Meena Iyer",
+            "segment": 2
+        },
+        {
+            "name": "Rahul Das",
+            "segment": 2
+        },
+        {
+            "name": "Employee 28",
+            "segment": 2
+        },
+        {
+            "name": "Employee 26",
+            "segment": 0
+        },
+        {
+            "name": "Employee 22",
+            "segment": 0
+        },
+        {
+            "name": "Employee 15",
+            "segment": 2
+        },
+        {
+            "name": "Employee 14",
+            "segment": 0
+        },
+        {
+            "name": "Employee 10",
+            "segment": 0
+        },
+        {
+            "name": "Employee 8",
+            "segment": 2
+        },
+        {
+            "name": "Employee 7",
+            "segment": 1
+        },
+        {
+            "name": "Employee 6",
+            "segment": 2
+        },
+        {
+            "name": "Employee 5",
+            "segment": 2
+        },
+        {
+            "name": "Employee 1",
+            "segment": 2
+        },
+        {
+            "name": "Employee 29",
+            "segment": 2
+        },
+        {
+            "name": "Employee 27",
+            "segment": 1
+        },
+        {
+            "name": "Employee 25",
+            "segment": 0
+        },
+        {
+            "name": "Employee 18",
+            "segment": 0
+        },
+        {
+            "name": "Employee 9",
+            "segment": 2
+        },
+        {
+            "name": "Employee 2",
+            "segment": 1
+        },
+        {
+            "name": "Employee 17",
+            "segment": 1
+        },
+        {
+            "name": "Employee 16",
+            "segment": 1
+        },
+        {
+            "name": "Employee 13",
+            "segment": 1
+        },
+        {
+            "name": "Employee 12",
+            "segment": 2
+        },
+        {
+            "name": "Employee 11",
+            "segment": 0
+        },
+        {
+            "name": "Employee 4",
+            "segment": 1
+        },
+        {
+            "name": "Employee 3",
+            "segment": 1
+        },
+        {
+            "name": "Employee 30",
+            "segment": 0
+        },
+        {
+            "name": "Employee 24",
+            "segment": 0
+        },
+        {
+            "name": "Employee 23",
+            "segment": 0
+        },
+        {
+            "name": "Employee 21",
+            "segment": 1
+        },
+        {
+            "name": "Employee 20",
+            "segment": 2
+        },
+        {
+            "name": "Employee 19",
+            "segment": 2
+        },
+        {
+            "name": "Priya Singh",
+            "segment": 2
+        },
+        {
+            "name": "Divya Naidu",
+            "segment": 2
+        }
+    ]
+}

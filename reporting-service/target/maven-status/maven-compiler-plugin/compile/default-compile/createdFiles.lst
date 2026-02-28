@@ -1,0 +1,3 @@
+com\company\reporting\client\EmployeeClient.class
+com\company\reporting\service\ReportService.class
+com\company\reporting\ReportingServiceApplication.class

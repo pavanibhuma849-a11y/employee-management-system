@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportGeneratorService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EMS Monolith</a> &gt; <a href="index.source.html" class="el_package">com.company.ems.service</a> &gt; <span class="el_source">ReportGeneratorService.java</span></div><h1>ReportGeneratorService.java</h1><pre class="source lang-java linenums">package com.company.ems.service;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+<span class="fc" id="L7">@Slf4j</span>
+@Service
+<span class="fc" id="L9">public class ReportGeneratorService {</span>
+
+    @Scheduled(fixedRateString = &quot;${ems.report.fixed-rate:60000}&quot;)
+    public void generateMonthlyReport() {
+        try {
+<span class="fc" id="L14">            log.info(&quot;Starting monthly performance report generation...&quot;);</span>
+<span class="fc" id="L15">            log.debug(&quot;Executing scheduled report generation task&quot;);</span>
+            
+<span class="fc" id="L17">            System.out.println(&quot;Monthly report generated successfully.&quot;);</span>
+            
+<span class="fc" id="L19">            log.info(&quot;Monthly performance report generated successfully&quot;);</span>
+<span class="nc" id="L20">        } catch (Exception ex) {</span>
+<span class="nc" id="L21">            log.error(&quot;Error generating monthly report: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L22">        }</span>
+<span class="fc" id="L23">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

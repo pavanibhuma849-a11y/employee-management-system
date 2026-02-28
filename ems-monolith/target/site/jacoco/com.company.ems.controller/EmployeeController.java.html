@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmployeeController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EMS Monolith</a> &gt; <a href="index.source.html" class="el_package">com.company.ems.controller</a> &gt; <span class="el_source">EmployeeController.java</span></div><h1>EmployeeController.java</h1><pre class="source lang-java linenums">package com.company.ems.controller;
+
+import com.company.ems.dto.EmployeeRequestDTO;
+import com.company.ems.dto.EmployeeResponseDTO;
+import com.company.ems.dto.EmployeeUpdateRequestDTO;
+import com.company.ems.service.IEmployeeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/employees&quot;)
+@Tag(name = &quot;Employee&quot;, description = &quot;Operations related to Employee Management&quot;)
+<span class="fc" id="L21">public class EmployeeController {</span>
+    
+<span class="fc" id="L23">    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);</span>
+    
+    @Autowired
+    private IEmployeeService employeeService;
+
+    @PostMapping
+    public ResponseEntity&lt;EmployeeResponseDTO&gt; createEmployee(@Valid @RequestBody EmployeeRequestDTO employeeDTO) {
+        try {
+<span class="fc" id="L31">            logger.info(&quot;Creating new employee with name: {}&quot;, employeeDTO.getName());</span>
+<span class="fc" id="L32">            EmployeeResponseDTO response = employeeService.createEmployee(employeeDTO);</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">            if (response != null) {</span>
+<span class="fc" id="L34">                logger.info(&quot;Employee created successfully with id: {}&quot;, response.getId());</span>
+<span class="fc" id="L35">            } else {</span>
+<span class="fc" id="L36">                logger.warn(&quot;Employee creation returned null response&quot;);</span>
+            }
+<span class="fc" id="L38">            return ResponseEntity.ok(response);</span>
+<span class="fc" id="L39">        } catch (Exception ex) {</span>
+<span class="fc" id="L40">            logger.error(&quot;Error creating employee: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L41">            throw ex;</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;EmployeeResponseDTO&gt; getEmployeeById(@PathVariable Long id) {
+        try {
+<span class="fc" id="L48">            logger.info(&quot;Fetching employee with id: {}&quot;, id);</span>
+<span class="fc" id="L49">            EmployeeResponseDTO response = employeeService.getEmployeeById(id);</span>
+<span class="fc" id="L50">            logger.info(&quot;Employee fetched successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L51">            return ResponseEntity.ok(response);</span>
+<span class="fc" id="L52">        } catch (Exception ex) {</span>
+<span class="fc" id="L53">            logger.error(&quot;Error fetching employee with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L54">            throw ex;</span>
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;Page&lt;EmployeeResponseDTO&gt;&gt; getEmployees(
+            @RequestParam(required = false) String department,
+            @RequestParam(defaultValue = &quot;0&quot;) int page,
+            @RequestParam(defaultValue = &quot;10&quot;) int size) {
+        try {
+<span class="fc" id="L64">            logger.info(&quot;Fetching employees - department: {}, page: {}, size: {}&quot;, department, page, size);</span>
+<span class="fc" id="L65">            Page&lt;EmployeeResponseDTO&gt; response = employeeService.getEmployees(department, PageRequest.of(page, size));</span>
+<span class="fc" id="L66">            logger.info(&quot;Employees fetched successfully - total elements: {}&quot;, response.getTotalElements());</span>
+<span class="fc" id="L67">            return ResponseEntity.ok(response);</span>
+<span class="fc" id="L68">        } catch (Exception ex) {</span>
+<span class="fc" id="L69">            logger.error(&quot;Error fetching employees: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L70">            throw ex;</span>
+        }
+    }
+
+    @GetMapping(&quot;/sorted&quot;)
+    public ResponseEntity&lt;List&lt;EmployeeResponseDTO&gt;&gt; getSortedEmployees() {
+        try {
+<span class="fc" id="L77">            logger.info(&quot;Fetching all employees sorted by name and date&quot;);</span>
+<span class="fc" id="L78">            List&lt;EmployeeResponseDTO&gt; response = employeeService.getAllEmployeesSortedByNameAndDate();</span>
+<span class="fc" id="L79">            logger.info(&quot;Sorted employees fetched successfully - total: {}&quot;, response.size());</span>
+<span class="fc" id="L80">            return ResponseEntity.ok(response);</span>
+<span class="fc" id="L81">        } catch (Exception ex) {</span>
+<span class="fc" id="L82">            logger.error(&quot;Error fetching sorted employees: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L83">            throw ex;</span>
+        }
+    }
+
+    @GetMapping(&quot;/sorted-by-salary&quot;)
+    public ResponseEntity&lt;List&lt;EmployeeResponseDTO&gt;&gt; getEmployeesSortedBySalary() {
+        try {
+<span class="nc" id="L90">            logger.info(&quot;Fetching all employees sorted by salary&quot;);</span>
+<span class="nc" id="L91">            List&lt;EmployeeResponseDTO&gt; response = employeeService.getAllEmployeesSortedBySalary();</span>
+<span class="nc" id="L92">            logger.info(&quot;Employees sorted by salary fetched successfully - total: {}&quot;, response.size());</span>
+<span class="nc" id="L93">            return ResponseEntity.ok(response);</span>
+<span class="nc" id="L94">        } catch (Exception ex) {</span>
+<span class="nc" id="L95">            logger.error(&quot;Error fetching employees sorted by salary: {}&quot;, ex.getMessage(), ex);</span>
+<span class="nc" id="L96">            throw ex;</span>
+        }
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;EmployeeResponseDTO&gt; updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeUpdateRequestDTO employeeDTO) {
+        try {
+<span class="fc" id="L103">            logger.info(&quot;Updating employee with id: {}&quot;, id);</span>
+<span class="fc" id="L104">            EmployeeResponseDTO response = employeeService.updateEmployee(id, employeeDTO);</span>
+<span class="fc" id="L105">            logger.info(&quot;Employee updated successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L106">            return ResponseEntity.ok(response);</span>
+<span class="fc" id="L107">        } catch (Exception ex) {</span>
+<span class="fc" id="L108">            logger.error(&quot;Error updating employee with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L109">            throw ex;</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteEmployee(@PathVariable Long id) {
+        try {
+<span class="fc" id="L116">            logger.info(&quot;Deleting employee with id: {}&quot;, id);</span>
+<span class="fc" id="L117">            employeeService.deleteEmployee(id);</span>
+<span class="fc" id="L118">            logger.info(&quot;Employee deleted successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L119">            return ResponseEntity.noContent().build();</span>
+<span class="fc" id="L120">        } catch (Exception ex) {</span>
+<span class="fc" id="L121">            logger.error(&quot;Error deleting employee with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L122">            throw ex;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

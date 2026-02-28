@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmployeeServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EMS Monolith</a> &gt; <a href="index.source.html" class="el_package">com.company.ems.service</a> &gt; <span class="el_source">EmployeeServiceImpl.java</span></div><h1>EmployeeServiceImpl.java</h1><pre class="source lang-java linenums">package com.company.ems.service;
+
+import com.company.ems.dto.EmployeeRequestDTO;
+import com.company.ems.dto.EmployeeResponseDTO;
+import com.company.ems.dto.EmployeeUpdateRequestDTO;
+import com.company.ems.exception.DepartmentNotFoundException;
+import com.company.ems.exception.EmployeeNotFoundException;
+import com.company.ems.model.Department;
+import com.company.ems.model.Employee;
+import com.company.ems.repository.DepartmentRepository;
+import com.company.ems.repository.EmployeeRepository;
+import com.company.ems.util.EmployeeComparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L25">public class EmployeeServiceImpl implements IEmployeeService {</span>
+    
+<span class="fc" id="L27">    private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);</span>
+    
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    @Override
+    public EmployeeResponseDTO createEmployee(EmployeeRequestDTO employeeDTO) {
+        try {
+<span class="fc" id="L38">            logger.debug(&quot;Creating employee with name: {}&quot;, employeeDTO.getName());</span>
+<span class="fc" id="L39">            Employee employee = mapToEntity(employeeDTO);</span>
+<span class="fc" id="L40">            Employee savedEmployee = employeeRepository.save(employee);</span>
+<span class="fc" id="L41">            logger.info(&quot;Employee created successfully with id: {}&quot;, savedEmployee.getId());</span>
+<span class="fc" id="L42">            return mapToResponseDTO(savedEmployee);</span>
+<span class="fc" id="L43">        } catch (Exception ex) {</span>
+<span class="fc" id="L44">            logger.error(&quot;Error creating employee: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L45">            throw ex;</span>
+        }
+    }
+
+    @Override
+    public EmployeeResponseDTO getEmployeeById(Long id) {
+        try {
+<span class="fc" id="L52">            logger.debug(&quot;Fetching employee with id: {}&quot;, id);</span>
+<span class="fc" id="L53">            Employee employee = employeeRepository.findById(id)</span>
+<span class="fc" id="L54">                    .orElseThrow(() -&gt; new EmployeeNotFoundException(&quot;Employee not found with id: &quot; + id));</span>
+<span class="fc" id="L55">            logger.info(&quot;Employee fetched successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L56">            return mapToResponseDTO(employee);</span>
+<span class="fc" id="L57">        } catch (EmployeeNotFoundException ex) {</span>
+<span class="fc" id="L58">            logger.warn(&quot;Employee not found with id: {}&quot;, id);</span>
+<span class="fc" id="L59">            throw ex;</span>
+<span class="fc" id="L60">        } catch (Exception ex) {</span>
+<span class="fc" id="L61">            logger.error(&quot;Error fetching employee with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L62">            throw ex;</span>
+        }
+    }
+
+    @Override
+    public Page&lt;EmployeeResponseDTO&gt; getEmployees(String departmentName, Pageable pageable) {
+        try {
+<span class="fc" id="L69">            logger.debug(&quot;Fetching employees - department: {}, page: {}, size: {}&quot;, departmentName, pageable.getPageNumber(), pageable.getPageSize());</span>
+            Page&lt;Employee&gt; employees;
+<span class="fc bfc" id="L71" title="All 4 branches covered.">            if (departmentName != null &amp;&amp; !departmentName.isEmpty()) {</span>
+<span class="fc" id="L72">                employees = employeeRepository.findByDepartmentName(departmentName, pageable);</span>
+<span class="fc" id="L73">                logger.info(&quot;Employees fetched by department: {} - total: {}&quot;, departmentName, employees.getTotalElements());</span>
+            } else {
+<span class="fc" id="L75">                employees = employeeRepository.findAll(pageable);</span>
+<span class="fc" id="L76">                logger.info(&quot;All employees fetched - total: {}&quot;, employees.getTotalElements());</span>
+            }
+<span class="fc" id="L78">            return employees.map(this::mapToResponseDTO);</span>
+<span class="fc" id="L79">        } catch (Exception ex) {</span>
+<span class="fc" id="L80">            logger.error(&quot;Error fetching employees: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L81">            throw ex;</span>
+        }
+    }
+
+    @Override
+    public EmployeeResponseDTO updateEmployee(Long id, EmployeeUpdateRequestDTO employeeDTO) {
+        try {
+<span class="fc" id="L88">            logger.debug(&quot;Updating employee with id: {}&quot;, id);</span>
+<span class="fc" id="L89">            Employee employee = employeeRepository.findById(id)</span>
+<span class="fc" id="L90">                    .orElseThrow(() -&gt; new EmployeeNotFoundException(&quot;Employee not found with id: &quot; + id));</span>
+            
+<span class="fc" id="L92">            employee.setName(employeeDTO.getName());</span>
+<span class="fc" id="L93">            employee.setRole(employeeDTO.getRole());</span>
+<span class="fc" id="L94">            employee.setSalary(employeeDTO.getSalary());</span>
+<span class="fc" id="L95">            employee.setJoiningDate(employeeDTO.getJoiningDate());</span>
+            
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            if (employeeDTO.getDepartmentId() != null) {</span>
+                try {
+<span class="fc" id="L99">                    Department department = departmentRepository.findById(employeeDTO.getDepartmentId())</span>
+<span class="fc" id="L100">                            .orElseThrow(() -&gt; new DepartmentNotFoundException(&quot;Department not found with id: &quot; + employeeDTO.getDepartmentId()));</span>
+<span class="fc" id="L101">                    employee.setDepartment(department);</span>
+<span class="fc" id="L102">                    logger.debug(&quot;Department assigned to employee&quot;);</span>
+<span class="fc" id="L103">                } catch (Exception ex) {</span>
+<span class="fc" id="L104">                    logger.error(&quot;Error assigning department to employee: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L105">                    throw ex;</span>
+<span class="fc" id="L106">                }</span>
+            }
+
+<span class="fc" id="L109">            Employee updatedEmployee = employeeRepository.save(employee);</span>
+<span class="fc" id="L110">            logger.info(&quot;Employee updated successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L111">            return mapToResponseDTO(updatedEmployee);</span>
+<span class="fc" id="L112">        } catch (EmployeeNotFoundException ex) {</span>
+<span class="fc" id="L113">            logger.warn(&quot;Employee not found with id: {}&quot;, id);</span>
+<span class="fc" id="L114">            throw ex;</span>
+<span class="fc" id="L115">        } catch (Exception ex) {</span>
+<span class="fc" id="L116">            logger.error(&quot;Error updating employee with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L117">            throw ex;</span>
+        }
+    }
+
+    @Override
+    public void deleteEmployee(Long id) {
+        try {
+<span class="fc" id="L124">            logger.debug(&quot;Deleting employee with id: {}&quot;, id);</span>
+<span class="fc" id="L125">            Employee employee = employeeRepository.findById(id)</span>
+<span class="fc" id="L126">                    .orElseThrow(() -&gt; new EmployeeNotFoundException(&quot;Employee not found with id: &quot; + id));</span>
+<span class="fc" id="L127">            employeeRepository.delete(employee);</span>
+<span class="fc" id="L128">            logger.info(&quot;Employee deleted successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L129">        } catch (EmployeeNotFoundException ex) {</span>
+<span class="fc" id="L130">            logger.warn(&quot;Employee not found with id: {}&quot;, id);</span>
+<span class="fc" id="L131">            throw ex;</span>
+<span class="fc" id="L132">        } catch (Exception ex) {</span>
+<span class="fc" id="L133">            logger.error(&quot;Error deleting employee with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L134">            throw ex;</span>
+<span class="fc" id="L135">        }</span>
+<span class="fc" id="L136">    }</span>
+
+    @Override
+    public List&lt;EmployeeResponseDTO&gt; getAllEmployeesSortedByNameAndDate() {
+        try {
+<span class="fc" id="L141">            logger.debug(&quot;Fetching all employees for sorting using custom comparator&quot;);</span>
+<span class="fc" id="L142">            List&lt;Employee&gt; employees = employeeRepository.findAll();</span>
+            
+<span class="fc" id="L144">            employees.sort(new EmployeeComparator());</span>
+<span class="fc" id="L145">            logger.info(&quot;Employees fetched and sorted successfully using EmployeeComparator - total: {}&quot;, employees.size());</span>
+            
+<span class="fc" id="L147">            return employees.stream().map(this::mapToResponseDTO).collect(Collectors.toList());</span>
+<span class="fc" id="L148">        } catch (Exception ex) {</span>
+<span class="fc" id="L149">            logger.error(&quot;Error fetching sorted employees: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L150">            throw ex;</span>
+        }
+    }
+
+    @Override
+    public List&lt;EmployeeResponseDTO&gt; getAllEmployeesSortedBySalary() {
+        try {
+<span class="nc" id="L157">            logger.debug(&quot;Fetching all employees for natural sorting by salary&quot;);</span>
+<span class="nc" id="L158">            List&lt;Employee&gt; employees = employeeRepository.findAll();</span>
+            
+            // Natural sorting uses Employee's compareTo (sort by salary)
+<span class="nc" id="L161">            employees.sort(null); </span>
+<span class="nc" id="L162">            logger.info(&quot;Employees fetched and naturally sorted by salary - total: {}&quot;, employees.size());</span>
+            
+<span class="nc" id="L164">            return employees.stream().map(this::mapToResponseDTO).collect(Collectors.toList());</span>
+<span class="nc" id="L165">        } catch (Exception ex) {</span>
+<span class="nc" id="L166">            logger.error(&quot;Error fetching naturally sorted employees: {}&quot;, ex.getMessage(), ex);</span>
+<span class="nc" id="L167">            throw ex;</span>
+        }
+    }
+
+    private Employee mapToEntity(EmployeeRequestDTO dto) {
+        try {
+<span class="fc" id="L173">            Employee employee = new Employee();</span>
+<span class="fc" id="L174">            employee.setName(dto.getName());</span>
+<span class="fc" id="L175">            employee.setRole(dto.getRole());</span>
+<span class="fc" id="L176">            employee.setSalary(dto.getSalary());</span>
+<span class="fc" id="L177">            employee.setJoiningDate(dto.getJoiningDate());</span>
+            
+<span class="fc bfc" id="L179" title="All 2 branches covered.">            if (dto.getDepartmentId() != null) {</span>
+                try {
+<span class="fc" id="L181">                    Department department = departmentRepository.findById(dto.getDepartmentId())</span>
+<span class="fc" id="L182">                            .orElseThrow(() -&gt; new DepartmentNotFoundException(&quot;Department not found with id: &quot; + dto.getDepartmentId()));</span>
+<span class="fc" id="L183">                    employee.setDepartment(department);</span>
+<span class="fc" id="L184">                } catch (Exception ex) {</span>
+<span class="fc" id="L185">                    logger.error(&quot;Error mapping department to employee entity: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L186">                    throw ex;</span>
+<span class="fc" id="L187">                }</span>
+            }
+<span class="fc" id="L189">            return employee;</span>
+<span class="fc" id="L190">        } catch (Exception ex) {</span>
+<span class="fc" id="L191">            logger.error(&quot;Error mapping EmployeeRequestDTO to Employee entity: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L192">            throw ex;</span>
+        }
+    }
+
+    private EmployeeResponseDTO mapToResponseDTO(Employee employee) {
+        try {
+<span class="fc" id="L198">            EmployeeResponseDTO dto = new EmployeeResponseDTO();</span>
+<span class="fc" id="L199">            dto.setId(employee.getId());</span>
+<span class="fc" id="L200">            dto.setName(employee.getName());</span>
+<span class="fc" id="L201">            dto.setRole(employee.getRole());</span>
+<span class="fc" id="L202">            dto.setSalary(employee.getSalary());</span>
+<span class="fc" id="L203">            dto.setJoiningDate(employee.getJoiningDate());</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">            if (employee.getDepartment() != null) {</span>
+<span class="fc" id="L205">                dto.setDepartmentName(employee.getDepartment().getName());</span>
+            }
+<span class="fc" id="L207">            return dto;</span>
+<span class="nc" id="L208">        } catch (Exception ex) {</span>
+<span class="nc" id="L209">            logger.error(&quot;Error mapping Employee to EmployeeResponseDTO: {}&quot;, ex.getMessage(), ex);</span>
+<span class="nc" id="L210">            throw ex;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,126 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.company:ems-monolith >----------------------
+[INFO] Building EMS Monolith 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- jacoco:0.8.10:prepare-agent (default) @ ems-monolith ---
+[INFO] argLine set to "-javaagent:C:\\Users\\bluepal\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.10\\org.jacoco.agent-0.8.10-runtime.jar=destfile=d:\\New folder (5) (1)\\ems-monolith\\target\\jacoco.exec"
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ems-monolith ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ ems-monolith ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ems-monolith ---
+[INFO] skip non existing resourceDirectory d:\New folder (5) (1)\ems-monolith\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ ems-monolith ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ ems-monolith ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.company.ems.service.ReportGeneratorServiceTest
+15:27:11.903 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.company.ems.service.ReportGeneratorServiceTest]: ReportGeneratorServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+15:27:12.415 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.company.ems.EmsApplication for test class com.company.ems.service.ReportGeneratorServiceTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.2)
+
+2026-02-23T15:27:14.518+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.e.s.ReportGeneratorServiceTest       : Starting ReportGeneratorServiceTest using Java 17.0.12 with PID 17360 (started by bluepal in d:\New folder (5) (1)\ems-monolith)
+2026-02-23T15:27:14.523+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.e.s.ReportGeneratorServiceTest       : No active profile set, falling back to 1 default profile: "default"
+2026-02-23T15:27:17.727+05:30  INFO 17360 --- [employee-management-system] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-23T15:27:17.987+05:30  INFO 17360 --- [employee-management-system] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 200 ms. Found 3 JPA repository interfaces.
+2026-02-23T15:27:20.093+05:30  INFO 17360 --- [employee-management-system] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-23T15:27:21.127+05:30  INFO 17360 --- [employee-management-system] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2026-02-23T15:27:21.131+05:30  INFO 17360 --- [employee-management-system] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-23T15:27:21.614+05:30  INFO 17360 --- [employee-management-system] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-23T15:27:21.861+05:30  INFO 17360 --- [employee-management-system] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.1.Final
+2026-02-23T15:27:22.045+05:30  INFO 17360 --- [employee-management-system] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-23T15:27:23.189+05:30  INFO 17360 --- [employee-management-system] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-23T15:27:23.510+05:30  WARN 17360 --- [employee-management-system] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-23T15:27:27.698+05:30  INFO 17360 --- [employee-management-system] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    alter table if exists department 
+       alter column id set data type bigint
+Hibernate: 
+    alter table if exists employee 
+       alter column id set data type bigint
+Hibernate: 
+    alter table if exists employee 
+       alter column salary set data type float(53)
+Hibernate: 
+    alter table if exists employee 
+       alter column department_id set data type bigint
+Hibernate: 
+    alter table if exists employee_project 
+       alter column employee_id set data type bigint
+Hibernate: 
+    alter table if exists employee_project 
+       alter column project_id set data type bigint
+Hibernate: 
+    alter table if exists project 
+       alter column id set data type bigint
+2026-02-23T15:27:28.066+05:30  INFO 17360 --- [employee-management-system] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-02-23T15:27:34.072+05:30  WARN 17360 --- [employee-management-system] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-23T15:27:36.571+05:30  INFO 17360 --- [employee-management-system] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+2026-02-23T15:27:36.843+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.e.s.ReportGeneratorServiceTest       : Started ReportGeneratorServiceTest in 23.736 seconds (process running for 28.483)
+2026-02-23T15:27:37.004+05:30  INFO 17360 --- [employee-management-system] [   scheduling-1] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.005+05:30  INFO 17360 --- [employee-management-system] [   scheduling-1] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+2026-02-23T15:27:37.188+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.188+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+2026-02-23T15:27:37.388+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.388+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+2026-02-23T15:27:37.389+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.390+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+2026-02-23T15:27:37.391+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.391+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+2026-02-23T15:27:37.451+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.453+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+2026-02-23T15:27:37.476+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.480+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+2026-02-23T15:27:37.513+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.516+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+2026-02-23T15:27:37.520+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.520+05:30  INFO 17360 --- [employee-management-system] [           main] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+2026-02-23T15:27:37.844+05:30  INFO 17360 --- [employee-management-system] [   scheduling-1] c.c.ems.service.ReportGeneratorService   : Starting monthly performance report generation...
+Monthly report generated successfully.
+2026-02-23T15:27:37.845+05:30  INFO 17360 --- [employee-management-system] [   scheduling-1] c.c.ems.service.ReportGeneratorService   : Monthly performance report generated successfully
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 26.76 s -- in com.company.ems.service.ReportGeneratorServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jacoco:0.8.10:report (report) @ ems-monolith ---
+[INFO] Loading execution data file d:\New folder (5) (1)\ems-monolith\target\jacoco.exec
+[INFO] Analyzed bundle 'EMS Monolith' with 22 classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  38.500 s
+[INFO] Finished at: 2026-02-23T15:27:40+05:30
+[INFO] ------------------------------------------------------------------------

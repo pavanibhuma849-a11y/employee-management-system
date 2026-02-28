@@ -1,0 +1,31 @@
+id,name,role,salary,years_experience,department,joiningDate,performance_score
+1,Employee 1,IT Support,51427,2,Design,2010-01-31,63
+2,Employee 2,IT Support,113467,15,IT,2010-02-28,70
+3,Employee 3,HR,71786,6,HR,2010-03-31,84
+4,Employee 4,Developer,91822,10,HR,2010-04-30,83
+5,Employee 5,Designer,155841,23,HR,2010-05-31,80
+6,Employee 6,HR,90745,10,Management,2010-06-30,77
+7,Employee 7,IT Support,131659,18,IT,2010-07-31,69
+8,Employee 8,IT Support,155949,23,Design,2010-08-31,93
+9,Employee 9,IT Support,105664,13,IT,2010-09-30,78
+10,Employee 10,HR,99189,12,Management,2010-10-31,60
+11,Employee 11,Manager,110159,14,HR,2010-11-30,78
+12,Employee 12,Developer,55678,3,Design,2010-12-31,68
+13,Employee 13,IT Support,81478,8,Management,2011-01-31,93
+14,Employee 14,Developer,56573,3,IT,2011-02-28,98
+15,Employee 15,IT Support,55141,3,IT,2011-03-31,89
+16,Employee 16,IT Support,79884,8,Management,2011-04-30,76
+17,Employee 17,Developer,148612,22,IT,2011-05-31,88
+18,Employee 18,Developer,128439,18,Management,2011-06-30,84
+19,Employee 19,Manager,64689,5,Design,2011-07-31,77
+20,Employee 20,HR,140323,20,Design,2011-08-31,86
+21,Employee 21,HR,75436,7,IT,2011-09-30,76
+22,Employee 22,Designer,126703,17,IT,2011-10-31,74
+23,Employee 23,Developer,109666,14,HR,2011-11-30,74
+24,Employee 24,Designer,108655,14,Design,2011-12-31,99
+25,Employee 25,HR,66220,5,IT,2012-01-31,63
+26,Employee 26,HR,88630,10,HR,2012-02-29,67
+27,Employee 27,Developer,124239,17,IT,2012-03-31,79
+28,Employee 28,IT Support,160699,24,Management,2012-04-30,81
+29,Employee 29,HR,68202,6,HR,2012-05-31,76
+30,Employee 30,IT Support,70527,6,Design,2012-06-30,97

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DepartmentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EMS Monolith</a> &gt; <a href="index.source.html" class="el_package">com.company.ems.controller</a> &gt; <span class="el_source">DepartmentController.java</span></div><h1>DepartmentController.java</h1><pre class="source lang-java linenums">package com.company.ems.controller;
+
+import com.company.ems.dto.DepartmentRequestDTO;
+import com.company.ems.dto.DepartmentResponseDTO;
+import com.company.ems.dto.DepartmentUpdateRequestDTO;
+import com.company.ems.service.IDepartmentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/departments&quot;)
+@Tag(name = &quot;Department&quot;, description = &quot;Operations related to Department Management&quot;)
+<span class="fc" id="L19">public class DepartmentController {</span>
+
+<span class="fc" id="L21">    private static final Logger logger = LoggerFactory.getLogger(DepartmentController.class);</span>
+
+    @Autowired
+    private IDepartmentService departmentService;
+
+    @PostMapping
+    public ResponseEntity&lt;DepartmentResponseDTO&gt; createDepartment(@Valid @RequestBody DepartmentRequestDTO departmentDTO) {
+        try {
+<span class="fc" id="L29">            logger.info(&quot;Creating new department with name: {}&quot;, departmentDTO.getName());</span>
+<span class="fc" id="L30">            DepartmentResponseDTO response = departmentService.createDepartment(departmentDTO);</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">            if (response != null) {</span>
+<span class="fc" id="L32">                logger.info(&quot;Department created successfully with id: {}&quot;, response.getId());</span>
+            } else {
+<span class="fc" id="L34">                logger.warn(&quot;Department creation returned null response&quot;);</span>
+            }
+<span class="fc" id="L36">            return ResponseEntity.ok(response);</span>
+<span class="fc" id="L37">        } catch (Exception ex) {</span>
+<span class="fc" id="L38">            logger.error(&quot;Error creating department: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L39">            throw ex;</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;DepartmentResponseDTO&gt; getDepartmentById(@PathVariable Long id) {
+        try {
+<span class="fc" id="L46">            logger.info(&quot;Fetching department with id: {}&quot;, id);</span>
+<span class="fc" id="L47">            DepartmentResponseDTO response = departmentService.getDepartmentById(id);</span>
+<span class="fc" id="L48">            logger.info(&quot;Department fetched successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L49">            return ResponseEntity.ok(response);</span>
+<span class="fc" id="L50">        } catch (Exception ex) {</span>
+<span class="fc" id="L51">            logger.error(&quot;Error fetching department with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L52">            throw ex;</span>
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;DepartmentResponseDTO&gt;&gt; getAllDepartments() {
+        try {
+<span class="fc" id="L59">            logger.info(&quot;Fetching all departments&quot;);</span>
+<span class="fc" id="L60">            List&lt;DepartmentResponseDTO&gt; response = departmentService.getAllDepartments();</span>
+<span class="fc" id="L61">            logger.info(&quot;Departments fetched successfully - total: {}&quot;, response.size());</span>
+<span class="fc" id="L62">            return ResponseEntity.ok(response);</span>
+<span class="fc" id="L63">        } catch (Exception ex) {</span>
+<span class="fc" id="L64">            logger.error(&quot;Error fetching all departments: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L65">            throw ex;</span>
+        }
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;DepartmentResponseDTO&gt; updateDepartment(@PathVariable Long id, @Valid @RequestBody DepartmentUpdateRequestDTO departmentDTO) {
+        try {
+<span class="fc" id="L72">            logger.info(&quot;Updating department with id: {}&quot;, id);</span>
+<span class="fc" id="L73">            DepartmentResponseDTO response = departmentService.updateDepartment(id, departmentDTO);</span>
+<span class="fc" id="L74">            logger.info(&quot;Department updated successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L75">            return ResponseEntity.ok(response);</span>
+<span class="fc" id="L76">        } catch (Exception ex) {</span>
+<span class="fc" id="L77">            logger.error(&quot;Error updating department with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L78">            throw ex;</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteDepartment(@PathVariable Long id) {
+        try {
+<span class="fc" id="L85">            logger.info(&quot;Deleting department with id: {}&quot;, id);</span>
+<span class="fc" id="L86">            departmentService.deleteDepartment(id);</span>
+<span class="fc" id="L87">            logger.info(&quot;Department deleted successfully with id: {}&quot;, id);</span>
+<span class="fc" id="L88">            return ResponseEntity.noContent().build();</span>
+<span class="fc" id="L89">        } catch (Exception ex) {</span>
+<span class="fc" id="L90">            logger.error(&quot;Error deleting department with id {}: {}&quot;, id, ex.getMessage(), ex);</span>
+<span class="fc" id="L91">            throw ex;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
