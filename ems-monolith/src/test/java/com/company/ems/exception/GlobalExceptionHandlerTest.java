@@ -6,6 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.core.MethodParameter;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -22,6 +26,11 @@ public class GlobalExceptionHandlerTest {
         globalExceptionHandler = new GlobalExceptionHandler();
         MockHttpServletRequest request = new MockHttpServletRequest();
         webRequest = new ServletWebRequest(request);
+    }
+
+    // Helper method used only for creating a MethodParameter instance in validation tests
+    private void dummyMethod(String arg) {
+        // no-op
     }
 
     @Test
@@ -74,6 +83,51 @@ public class GlobalExceptionHandlerTest {
         Map<String, Object> body = (Map<String, Object>) response.getBody();
         assertEquals(message, body.get("message"));
         assertNotNull(body.get("timestamp"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testHandleBadRequestException() {
+        String message = "Invalid project duration";
+        InvalidProjectDurationException exception = new InvalidProjectDurationException(message);
+
+        ResponseEntity<?> response = globalExceptionHandler.handleBadRequestException(exception, webRequest);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals(message, body.get("message"));
+        assertNotNull(body.get("timestamp"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testHandleValidationException() throws NoSuchMethodException {
+        BeanPropertyBindingResult bindingResult =
+                new BeanPropertyBindingResult(new Object(), "testObject");
+        bindingResult.addError(new FieldError("testObject", "field1", "must not be null"));
+        bindingResult.addError(new FieldError("testObject", "field2", "must be positive"));
+
+        MethodParameter methodParameter =
+                new MethodParameter(this.getClass().getDeclaredMethod("dummyMethod", String.class), 0);
+        MethodArgumentNotValidException exception =
+                new MethodArgumentNotValidException(methodParameter, bindingResult);
+
+        ResponseEntity<?> response = globalExceptionHandler.handleValidationException(exception);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals("Validation failed", body.get("message"));
+        assertNotNull(body.get("timestamp"));
+
+        Map<String, String> errors = (Map<String, String>) body.get("errors");
+        assertEquals(2, errors.size());
+        assertEquals("must not be null", errors.get("field1"));
+        assertEquals("must be positive", errors.get("field2"));
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.company.ems.service;
 import com.company.ems.dto.ProjectRequestDTO;
 import com.company.ems.dto.ProjectResponseDTO;
 import com.company.ems.dto.ProjectUpdateRequestDTO;
+import com.company.ems.exception.InvalidProjectDurationException;
 import com.company.ems.exception.ProjectNotFoundException;
 import com.company.ems.model.Project;
 import com.company.ems.repository.ProjectRepository;
@@ -63,6 +64,16 @@ public class ProjectServiceImplTest {
         assertEquals(6, result.getDuration());
         assertEquals(1L, result.getId());
         verify(projectRepository, times(1)).save(any(Project.class));
+    }
+
+    @Test
+    public void testCreateProject_InvalidDuration_ThrowsException() {
+        ProjectRequestDTO requestDTO = new ProjectRequestDTO();
+        requestDTO.setName("Invalid Duration Project");
+        requestDTO.setDuration(0);
+
+        assertThrows(InvalidProjectDurationException.class, () -> projectService.createProject(requestDTO));
+        verify(projectRepository, never()).save(any(Project.class));
     }
 
     @Test
@@ -250,6 +261,17 @@ public class ProjectServiceImplTest {
     }
 
     @Test
+    public void testUpdateProject_InvalidDuration_ThrowsException() {
+        ProjectUpdateRequestDTO updateDTO = new ProjectUpdateRequestDTO();
+        updateDTO.setName("Any Name");
+        updateDTO.setDuration(-5);
+
+        assertThrows(InvalidProjectDurationException.class, () -> projectService.updateProject(1L, updateDTO));
+        verify(projectRepository, never()).findById(anyLong());
+        verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
     public void testUpdateProject_ChangeDurationOnly() {
         ProjectUpdateRequestDTO updateDTO = new ProjectUpdateRequestDTO();
         updateDTO.setName("Mobile App Development");
@@ -369,6 +391,14 @@ public class ProjectServiceImplTest {
         when(projectRepository.save(any(Project.class))).thenThrow(new RuntimeException("Database error"));
 
         assertThrows(RuntimeException.class, () -> projectService.createProject(projectRequestDTO));
+        verify(projectRepository, times(1)).save(any(Project.class));
+    }
+
+    @Test
+    public void testCreateProject_WhenRepositoryReturnsNull_ProjectMappingThrows() {
+        when(projectRepository.save(any(Project.class))).thenReturn(null);
+
+        assertThrows(NullPointerException.class, () -> projectService.createProject(projectRequestDTO));
         verify(projectRepository, times(1)).save(any(Project.class));
     }
 

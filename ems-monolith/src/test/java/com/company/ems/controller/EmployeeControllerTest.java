@@ -201,6 +201,33 @@ public class EmployeeControllerTest {
     }
 
     @Test
+    public void testGetEmployeesSortedBySalary_Success() throws Exception {
+        EmployeeResponseDTO employee1 = new EmployeeResponseDTO();
+        employee1.setId(1L);
+        employee1.setName("Alice Johnson");
+        employee1.setSalary(50000.0);
+
+        EmployeeResponseDTO employee2 = new EmployeeResponseDTO();
+        employee2.setId(2L);
+        employee2.setName("Bob Smith");
+        employee2.setSalary(70000.0);
+
+        List<EmployeeResponseDTO> sortedBySalary = Arrays.asList(employee1, employee2);
+
+        when(employeeService.getAllEmployeesSortedBySalary())
+                .thenReturn(sortedBySalary);
+
+        mockMvc.perform(get("/employees/sorted-by-salary")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name", is("Alice Johnson")))
+                .andExpect(jsonPath("$[1].name", is("Bob Smith")));
+
+        verify(employeeService, times(1)).getAllEmployeesSortedBySalary();
+    }
+
+    @Test
     public void testUpdateEmployee_Success() throws Exception {
         EmployeeResponseDTO updatedEmployee = new EmployeeResponseDTO();
         updatedEmployee.setId(1L);
