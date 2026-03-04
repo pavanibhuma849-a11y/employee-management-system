@@ -28,11 +28,6 @@ public class GlobalExceptionHandlerTest {
         webRequest = new ServletWebRequest(request);
     }
 
-    // Helper method used only for creating a MethodParameter instance in validation tests
-    private void dummyMethod(String arg) {
-        // no-op
-    }
-
     @Test
     @SuppressWarnings("unchecked")
     public void testHandleEmployeeNotFoundException() {

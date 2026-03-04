@@ -321,7 +321,8 @@ public class ProjectControllerTest {
 
         mockMvc.perform(delete("/projects/1")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(content().string("Project deleted successfully"));
 
         verify(projectService, times(1)).deleteProject(1L);
     }
@@ -332,7 +333,8 @@ public class ProjectControllerTest {
 
         mockMvc.perform(delete("/projects/2")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(content().string("Project deleted successfully"));
 
         verify(projectService, times(1)).deleteProject(2L);
     }

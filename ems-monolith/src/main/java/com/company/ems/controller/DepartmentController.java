@@ -80,12 +80,12 @@ public class DepartmentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
+    public ResponseEntity<String> deleteDepartment(@PathVariable Long id) {
         try {
             logger.info("Deleting department with id: {}", id);
             departmentService.deleteDepartment(id);
             logger.info("Department deleted successfully with id: {}", id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("Department deleted successfully");
         } catch (Exception ex) {
             logger.error("Error deleting department with id {}: {}", id, ex.getMessage(), ex);
             throw ex;

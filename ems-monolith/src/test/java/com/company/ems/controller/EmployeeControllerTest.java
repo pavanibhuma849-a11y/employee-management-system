@@ -264,7 +264,8 @@ public class EmployeeControllerTest {
 
         mockMvc.perform(delete("/employees/1")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(content().string("Employee deleted successfully"));
 
         verify(employeeService, times(1)).deleteEmployee(1L);
     }
@@ -460,7 +461,8 @@ public class EmployeeControllerTest {
 
         mockMvc.perform(delete("/employees/1")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(content().string("Employee deleted successfully"));
 
         verify(employeeService, times(1)).deleteEmployee(1L);
     }

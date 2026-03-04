@@ -252,7 +252,8 @@ public class DepartmentControllerTest {
 
         mockMvc.perform(delete("/departments/1")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(content().string("Department deleted successfully"));
 
         verify(departmentService, times(1)).deleteDepartment(1L);
     }
@@ -263,7 +264,8 @@ public class DepartmentControllerTest {
 
         mockMvc.perform(delete("/departments/2")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk())
+                .andExpect(content().string("Department deleted successfully"));
 
         verify(departmentService, times(1)).deleteDepartment(2L);
     }

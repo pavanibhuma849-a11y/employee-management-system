@@ -111,12 +111,12 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
         try {
             logger.info("Deleting employee with id: {}", id);
             employeeService.deleteEmployee(id);
             logger.info("Employee deleted successfully with id: {}", id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("Employee deleted successfully");
         } catch (Exception ex) {
             logger.error("Error deleting employee with id {}: {}", id, ex.getMessage(), ex);
             throw ex;

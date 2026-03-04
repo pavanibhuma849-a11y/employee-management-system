@@ -80,12 +80,12 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProject(@PathVariable Long id) {
         try {
             logger.info("Deleting project with id: {}", id);
             projectService.deleteProject(id);
             logger.info("Project deleted successfully with id: {}", id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("Project deleted successfully");
         } catch (Exception ex) {
             logger.error("Error deleting project with id {}: {}", id, ex.getMessage(), ex);
             throw ex;
