@@ -1,5 +1,6 @@
 package com.company.ems.exception;
 
+import com.company.ems.dto.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,14 +20,11 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler({EmployeeNotFoundException.class, DepartmentNotFoundException.class, ProjectNotFoundException.class})
-    public ResponseEntity<?> handleNotFoundException(RuntimeException ex, WebRequest request) {
+    public ResponseEntity<ApiResponse<Object>> handleNotFoundException(RuntimeException ex, WebRequest request) {
         try {
             logger.warn("Resource not found: {}", ex.getMessage());
-            Map<String, Object> body = new HashMap<>();
-            body.put("timestamp", LocalDateTime.now());
-            body.put("message", ex.getMessage());
-            logger.debug("Returning 404 response for not found exception");
-            return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+            ApiResponse<Object> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), null, ex.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             logger.error("Error handling not found exception: {}", e.getMessage(), e);
             throw e;
@@ -34,13 +32,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidProjectDurationException.class)
-    public ResponseEntity<?> handleBadRequestException(RuntimeException ex, WebRequest request) {
+    public ResponseEntity<ApiResponse<Object>> handleBadRequestException(RuntimeException ex, WebRequest request) {
         try {
             logger.warn("Bad request: {}", ex.getMessage());
-            Map<String, Object> body = new HashMap<>();
-            body.put("timestamp", LocalDateTime.now());
-            body.put("message", ex.getMessage());
-            return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+            ApiResponse<Object> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), null, ex.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             logger.error("Error handling bad request exception: {}", e.getMessage(), e);
             throw e;
@@ -48,11 +44,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationException(MethodArgumentNotValidException ex) {
         try {
             logger.warn("Validation failed: {}", ex.getMessage());
-            Map<String, Object> body = new HashMap<>();
-            body.put("timestamp", LocalDateTime.now());
             
             Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
                     .collect(Collectors.toMap(
@@ -61,25 +55,32 @@ public class GlobalExceptionHandler {
                             (existing, replacement) -> existing
                     ));
             
-            body.put("errors", errors);
-            body.put("message", "Validation failed");
-            
-            return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+            ApiResponse<Map<String, String>> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), errors, "Validation failed");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             logger.error("Error handling validation exception: {}", e.getMessage(), e);
             throw e;
         }
     }
 
+    @ExceptionHandler({DuplicateResourceException.class, ResourceConflictException.class})
+    public ResponseEntity<ApiResponse<Object>> handleConflictException(RuntimeException ex, WebRequest request) {
+        try {
+            logger.warn("Conflict: {}", ex.getMessage());
+            ApiResponse<Object> response = new ApiResponse<>(HttpStatus.CONFLICT.value(), null, ex.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            logger.error("Error handling conflict exception: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGlobalException(Exception ex, WebRequest request) {
+    public ResponseEntity<ApiResponse<Object>> handleGlobalException(Exception ex, WebRequest request) {
         try {
             logger.error("Unhandled exception occurred: {} - {}", ex.getClass().getName(), ex.getMessage(), ex);
-            Map<String, Object> body = new HashMap<>();
-            body.put("timestamp", LocalDateTime.now());
-            body.put("message", ex.getMessage());
-            logger.debug("Returning 500 response for global exception");
-            return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+            ApiResponse<Object> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, ex.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             logger.error("Error handling global exception: {}", e.getMessage(), e);
             throw e;

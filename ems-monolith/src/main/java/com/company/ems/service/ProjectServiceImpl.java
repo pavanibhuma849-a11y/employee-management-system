@@ -3,9 +3,12 @@ package com.company.ems.service;
 import com.company.ems.dto.ProjectRequestDTO;
 import com.company.ems.dto.ProjectResponseDTO;
 import com.company.ems.dto.ProjectUpdateRequestDTO;
+import com.company.ems.exception.EmployeeNotFoundException;
 import com.company.ems.exception.InvalidProjectDurationException;
 import com.company.ems.exception.ProjectNotFoundException;
+import com.company.ems.model.Employee;
 import com.company.ems.model.Project;
+import com.company.ems.repository.EmployeeRepository;
 import com.company.ems.repository.ProjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +24,9 @@ public class ProjectServiceImpl implements IProjectService {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     @Override
     public ProjectResponseDTO createProject(ProjectRequestDTO projectDTO) {
@@ -116,6 +122,27 @@ public class ProjectServiceImpl implements IProjectService {
             throw ex;
         } catch (Exception ex) {
             logger.error("Error deleting project with id {}: {}", id, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public void assignEmployeeToProject(Long projectId, Long employeeId) {
+        try {
+            logger.debug("Assigning employee with id {} to project with id {}", employeeId, projectId);
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new ProjectNotFoundException("Project not found with id: " + projectId));
+            Employee employee = employeeRepository.findById(employeeId)
+                    .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + employeeId));
+
+            employee.getProjects().add(project);
+            employeeRepository.save(employee);
+            logger.info("Employee with id {} successfully assigned to project with id {}", employeeId, projectId);
+        } catch (ProjectNotFoundException | EmployeeNotFoundException ex) {
+            logger.warn("Error assigning employee to project: {}", ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error assigning employee with id {} to project with id {}: {}", employeeId, projectId, ex.getMessage(), ex);
             throw ex;
         }
     }

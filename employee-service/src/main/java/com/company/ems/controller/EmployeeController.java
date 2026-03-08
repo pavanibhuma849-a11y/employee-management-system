@@ -1,5 +1,6 @@
 package com.company.ems.controller;
 
+import com.company.ems.dto.ApiResponse;
 import com.company.ems.dto.EmployeeRequestDTO;
 import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.dto.EmployeeUpdateRequestDTO;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -21,22 +23,28 @@ public class EmployeeController {
     @Autowired
     private IEmployeeService employeeService;
 
-    @PostMapping("/create")
-    public ResponseEntity<EmployeeResponseDTO> createEmployee(@Valid @RequestBody EmployeeRequestDTO employeeDTO) {
-        return ResponseEntity.ok(employeeService.createEmployee(employeeDTO));
+    @PostMapping
+    public ResponseEntity<ApiResponse<EmployeeResponseDTO>> createEmployee(@Valid @RequestBody EmployeeRequestDTO employeeDTO) {
+        EmployeeResponseDTO response = employeeService.createEmployee(employeeDTO);
+        ApiResponse<EmployeeResponseDTO> apiResponse = new ApiResponse<>(HttpStatus.CREATED.value(), response, "Employee created successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeResponseDTO> getEmployeeById(@PathVariable Long id) {
-        return ResponseEntity.ok(employeeService.getEmployeeById(id));
+    public ResponseEntity<ApiResponse<EmployeeResponseDTO>> getEmployeeById(@PathVariable Long id) {
+        EmployeeResponseDTO response = employeeService.getEmployeeById(id);
+        ApiResponse<EmployeeResponseDTO> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Employee fetched successfully");
+        return ResponseEntity.ok(apiResponse);
     }
 
     @GetMapping
-    public ResponseEntity<Page<EmployeeResponseDTO>> getEmployees(
+    public ResponseEntity<ApiResponse<Page<EmployeeResponseDTO>>> getEmployees(
             @RequestParam(required = false) String department,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(employeeService.getEmployees(department, PageRequest.of(page, size)));
+        Page<EmployeeResponseDTO> response = employeeService.getEmployees(department, PageRequest.of(page, size));
+        ApiResponse<Page<EmployeeResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Employees fetched successfully");
+        return ResponseEntity.ok(apiResponse);
     }
 
     @GetMapping("/sorted")
@@ -45,14 +53,17 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeUpdateRequestDTO employeeDTO) {
-        return ResponseEntity.ok(employeeService.updateEmployee(id, employeeDTO));
+    public ResponseEntity<ApiResponse<EmployeeResponseDTO>> updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeUpdateRequestDTO employeeDTO) {
+        EmployeeResponseDTO response = employeeService.updateEmployee(id, employeeDTO);
+        ApiResponse<EmployeeResponseDTO> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Employee updated successfully");
+        return ResponseEntity.ok(apiResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
-        return ResponseEntity.ok("Employee deleted successfully");
+        ApiResponse<Void> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), null, "employee remove from database succesfully");
+        return ResponseEntity.ok(apiResponse);
     }
 }
 

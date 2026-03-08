@@ -152,6 +152,8 @@ public class EmployeeServiceImpl implements IEmployeeService {
         dto.setRole(employee.getRole());
         dto.setSalary(employee.getSalary());
         dto.setJoiningDate(employee.getJoiningDate());
+        dto.setCreatedAt(employee.getCreatedAt());
+        dto.setUpdatedAt(employee.getUpdatedAt());
         if (employee.getDepartment() != null) {
             dto.setDepartmentName(employee.getDepartment().getName());
         }

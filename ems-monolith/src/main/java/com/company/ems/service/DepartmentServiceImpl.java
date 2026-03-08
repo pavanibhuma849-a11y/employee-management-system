@@ -3,8 +3,13 @@ package com.company.ems.service;
 import com.company.ems.dto.DepartmentRequestDTO;
 import com.company.ems.dto.DepartmentResponseDTO;
 import com.company.ems.dto.DepartmentUpdateRequestDTO;
+import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.exception.DepartmentNotFoundException;
+import com.company.ems.exception.DuplicateResourceException;
+import com.company.ems.exception.ResourceConflictException;
 import com.company.ems.model.Department;
+import com.company.ems.model.Employee;
+import com.company.ems.model.Project;
 import com.company.ems.repository.DepartmentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +31,19 @@ public class DepartmentServiceImpl implements IDepartmentService {
     public DepartmentResponseDTO createDepartment(DepartmentRequestDTO departmentDTO) {
         try {
             logger.debug("Creating department with name: {}", departmentDTO.getName());
+            
+            if (departmentRepository.existsByName(departmentDTO.getName())) {
+                throw new DuplicateResourceException("Department already exists with name: " + departmentDTO.getName());
+            }
+            
             Department department = new Department();
             department.setName(departmentDTO.getName());
             Department saved = departmentRepository.save(department);
             logger.info("Department created successfully with id: {}", saved.getId());
             return mapToResponseDTO(saved);
+        } catch (DuplicateResourceException ex) {
+            logger.warn("Duplicate department: {}", ex.getMessage());
+            throw ex;
         } catch (Exception ex) {
             logger.error("Error creating department: {}", ex.getMessage(), ex);
             throw ex;
@@ -100,13 +113,40 @@ public class DepartmentServiceImpl implements IDepartmentService {
             logger.debug("Deleting department with id: {}", id);
             Department department = departmentRepository.findById(id)
                     .orElseThrow(() -> new DepartmentNotFoundException("Department not found with id: " + id));
+            
+            if (department.getEmployees() != null && !department.getEmployees().isEmpty()) {
+                throw new ResourceConflictException("Cannot delete department with assigned employees: " + department.getName());
+            }
+            
             departmentRepository.delete(department);
             logger.info("Department deleted successfully with id: {}", id);
-        } catch (DepartmentNotFoundException ex) {
-            logger.warn("Department not found with id: {}", id);
+        } catch (DepartmentNotFoundException | ResourceConflictException ex) {
+            logger.warn("Error deleting department: {}", ex.getMessage());
             throw ex;
         } catch (Exception ex) {
             logger.error("Error deleting department with id {}: {}", id, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public List<EmployeeResponseDTO> getEmployeesByDepartment(Long departmentId) {
+        try {
+            logger.debug("Fetching employees for department with id: {}", departmentId);
+            Department department = departmentRepository.findById(departmentId)
+                    .orElseThrow(() -> new DepartmentNotFoundException("Department not found with id: " + departmentId));
+            
+            List<EmployeeResponseDTO> employees = department.getEmployees().stream()
+                    .map(this::mapToEmployeeResponseDTO)
+                    .collect(Collectors.toList());
+            
+            logger.info("Employees fetched successfully for department with id: {} - total: {}", departmentId, employees.size());
+            return employees;
+        } catch (DepartmentNotFoundException ex) {
+            logger.warn("Department not found for employee fetching: {}", departmentId);
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error fetching employees for department {}: {}", departmentId, ex.getMessage(), ex);
             throw ex;
         }
     }
@@ -119,6 +159,31 @@ public class DepartmentServiceImpl implements IDepartmentService {
             return dto;
         } catch (Exception ex) {
             logger.error("Error mapping Department to DepartmentResponseDTO: {}", ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    private EmployeeResponseDTO mapToEmployeeResponseDTO(Employee employee) {
+        try {
+            EmployeeResponseDTO dto = new EmployeeResponseDTO();
+            dto.setId(employee.getId());
+            dto.setName(employee.getName());
+            dto.setRole(employee.getRole());
+            dto.setSalary(employee.getSalary());
+            dto.setJoiningDate(employee.getJoiningDate());
+            dto.setCreatedAt(employee.getCreatedAt());
+            dto.setUpdatedAt(employee.getUpdatedAt());
+            if (employee.getDepartment() != null) {
+                dto.setDepartmentName(employee.getDepartment().getName());
+            }
+            if (employee.getProjects() != null) {
+                dto.setProjectNames(employee.getProjects().stream()
+                        .map(Project::getName)
+                        .collect(Collectors.toSet()));
+            }
+            return dto;
+        } catch (Exception ex) {
+            logger.error("Error mapping Employee to EmployeeResponseDTO: {}", ex.getMessage(), ex);
             throw ex;
         }
     }
