@@ -1,0 +1,29 @@
+
+Employee API	10	CRUD & Validation	Full CRUD + Edge Cases
+Department	5	Dept. Management	Create, Read, Delete
+Project	5	Project & Assignment	Many-to-Many Ops
+Database / ORM	8	Data Integrity & Perf.	Hibernate, SQL, Pagination
+Exception Handling	4	Error Scenarios	Global & Custom Exceptions
+Java / OOP	5	Core Logic	OOP, Collections, Threading
+
+
+TC-001	Employee API	Create Employee - Valid Data	POST /employees with valid JSON body (name, role, salary, joiningDate, departmentId)	HTTP 201 Created; employee record returned with generated ID	Pass
+TC-002	Employee API	Create Employee - Missing Required Field	POST /employees with missing 'name' field in request body	HTTP 400 Bad Request with validation error message	Pass
+TC-003	Employee API	Create Employee - Invalid Salary (Negative)	POST /employees with salary = -5000	HTTP 400 Bad Request; error: salary must be positive	Pass
+TC-004	Employee API	Retrieve Employee by Valid ID	GET /employees/{id} using an existing employee ID	HTTP 200 OK; correct employee JSON returned	Pass
+TC-005	Employee API	Retrieve Employee by Non-Existent ID	GET /employees/9999 where ID does not exist	HTTP 404 Not Found; EmployeeNotFoundException message returned	Pass
+TC-006	Employee API	Update Employee - Valid Data	PUT /employees/{id} with updated salary and role	HTTP 200 OK; updated employee record returned	Pass
+TC-007	Employee API	Update Employee - Non-Existent ID	PUT /employees/9999 with valid body	HTTP 404 Not Found with appropriate error message	Pass
+TC-008	Employee API	Delete Employee - Valid ID	DELETE /employees/{id} for existing employee	HTTP 204 No Content; employee removed from database	Pass
+TC-009	Employee API	Delete Employee - Non-Existent ID	DELETE /employees/9999	HTTP 404 Not Found; EmployeeNotFoundException thrown	Pass
+TC-010	Employee API	Filter Employees by Department	GET /employees?department=IT	HTTP 200 OK; list of employees in IT department returned	Pass
+TC-011	Department	Create Department - Valid Data	POST /departments with name='Engineering'	HTTP 201 Created; department created with unique ID	Pass
+TC-012	Department	Create Duplicate Department	POST /departments with name of already-existing department	HTTP 409 Conflict or appropriate duplicate error	Pass
+TC-013	Department	Get All Departments	GET /departments	HTTP 200 OK; list of all departments returned	Pass
+TC-014	Department	Get Employees Count per Department	GET /departments/{id}/employees	HTTP 200 OK; employee list for specified department returned	Pass
+TC-015	Department	Delete Department with Employees	DELETE /departments/{id} where department has assigned employees	HTTP 409 Conflict or cascading deletion with warning	Pass
+TC-016	Project	Create Project - Valid Data	POST /projects with name and duration fields	HTTP 201 Created; project created with ID	Pass
+TC-017	Project	Assign Employee to Project	POST /projects/{id}/employees/{empId}	HTTP 200 OK; employee_project junction record created	Pass
+TC-018	Project	Assign Already-Assigned Employee	POST /projects/{id}/employees/{empId} for already-assigned pair	HTTP 409 Conflict or idempotent 200 response	Pass
+TC-019	Project	Get All Employees on a Project	GET /projects/{id}/employees	HTTP 200 OK; list of employees assigned to project	Pass
+TC-020	Project	Remove Employee from Project	DELETE /projects/{id}/employees/{empId}	HTTP 204 No Content; junction record deleted	Pass

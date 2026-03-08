@@ -1,6 +1,7 @@
 package com.company.ems.controller;
 
 import com.company.ems.dto.ApiResponse;
+import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.dto.ProjectRequestDTO;
 import com.company.ems.dto.ProjectResponseDTO;
 import com.company.ems.dto.ProjectUpdateRequestDTO;
@@ -95,6 +96,48 @@ public class ProjectController {
             return ResponseEntity.ok(apiResponse);
         } catch (Exception ex) {
             logger.error("Error deleting project with id {}: {}", id, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @PostMapping("/{id}/employees/{empId}")
+    public ResponseEntity<ApiResponse<Void>> assignEmployeeToProject(@PathVariable Long id, @PathVariable Long empId) {
+        try {
+            logger.info("Assigning employee with id {} to project with id {}", empId, id);
+            projectService.assignEmployeeToProject(id, empId);
+            logger.info("Employee with id {} successfully assigned to project with id {}", empId, id);
+            ApiResponse<Void> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), null, "Employee assigned to project successfully");
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception ex) {
+            logger.error("Error assigning employee with id {} to project with id {}: {}", empId, id, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @DeleteMapping("/{id}/employees/{empId}")
+    public ResponseEntity<ApiResponse<Void>> removeEmployeeFromProject(@PathVariable Long id, @PathVariable Long empId) {
+        try {
+            logger.info("Removing employee with id {} from project with id {}", empId, id);
+            projectService.removeEmployeeFromProject(id, empId);
+            logger.info("Employee with id {} successfully removed from project with id {}", empId, id);
+            ApiResponse<Void> apiResponse = new ApiResponse<>(HttpStatus.NO_CONTENT.value(), null, "Employee removed from project successfully");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
+        } catch (Exception ex) {
+            logger.error("Error removing employee with id {} from project with id {}: {}", empId, id, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @GetMapping("/{id}/employees")
+    public ResponseEntity<ApiResponse<List<EmployeeResponseDTO>>> getEmployeesByProject(@PathVariable Long id) {
+        try {
+            logger.info("Fetching employees for project with id: {}", id);
+            List<EmployeeResponseDTO> response = projectService.getEmployeesByProjectId(id);
+            logger.info("Employees fetched successfully for project with id: {} - total: {}", id, response.size());
+            ApiResponse<List<EmployeeResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Employees fetched successfully for project");
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception ex) {
+            logger.error("Error fetching employees for project with id {}: {}", id, ex.getMessage(), ex);
             throw ex;
         }
     }

@@ -122,7 +122,7 @@ public class EmployeeController {
             logger.info("Deleting employee with id: {}", id);
             employeeService.deleteEmployee(id);
             logger.info("Employee deleted successfully with id: {}", id);
-            ApiResponse<Void> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), null, "employee remove from database succesfully");
+            ApiResponse<Void> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), null, "Employee deleted successfully");
             return ResponseEntity.ok(apiResponse);
         } catch (Exception ex) {
             logger.error("Error deleting employee with id {}: {}", id, ex.getMessage(), ex);

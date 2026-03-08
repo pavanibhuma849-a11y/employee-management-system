@@ -60,10 +60,10 @@ public class ProjectControllerTest {
         mockMvc.perform(post("/projects")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(projectRequestDTO)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("Mobile App Development")))
-                .andExpect(jsonPath("$.duration", is(6)));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.name", is("Mobile App Development")))
+                .andExpect(jsonPath("$.data.duration", is(6)));
 
         verify(projectService, times(1)).createProject(any(ProjectRequestDTO.class));
     }
@@ -85,10 +85,10 @@ public class ProjectControllerTest {
         mockMvc.perform(post("/projects")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(webRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(2)))
-                .andExpect(jsonPath("$.name", is("Web Application")))
-                .andExpect(jsonPath("$.duration", is(12)));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.id", is(2)))
+                .andExpect(jsonPath("$.data.name", is("Web Application")))
+                .andExpect(jsonPath("$.data.duration", is(12)));
 
         verify(projectService, times(1)).createProject(any(ProjectRequestDTO.class));
     }
@@ -110,8 +110,8 @@ public class ProjectControllerTest {
         mockMvc.perform(post("/projects")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(shortRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.duration", is(1)));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.duration", is(1)));
 
         verify(projectService, times(1)).createProject(any(ProjectRequestDTO.class));
     }
@@ -124,9 +124,9 @@ public class ProjectControllerTest {
         mockMvc.perform(get("/projects/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("Mobile App Development")))
-                .andExpect(jsonPath("$.duration", is(6)));
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.name", is("Mobile App Development")))
+                .andExpect(jsonPath("$.data.duration", is(6)));
 
         verify(projectService, times(1)).getProjectById(1L);
     }
@@ -144,9 +144,9 @@ public class ProjectControllerTest {
         mockMvc.perform(get("/projects/4")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(4)))
-                .andExpect(jsonPath("$.name", is("Data Analysis Tool")))
-                .andExpect(jsonPath("$.duration", is(8)));
+                .andExpect(jsonPath("$.data.id", is(4)))
+                .andExpect(jsonPath("$.data.name", is("Data Analysis Tool")))
+                .andExpect(jsonPath("$.data.duration", is(8)));
 
         verify(projectService, times(1)).getProjectById(4L);
     }
@@ -176,16 +176,16 @@ public class ProjectControllerTest {
         mockMvc.perform(get("/projects")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[0].name", is("Mobile App Development")))
-                .andExpect(jsonPath("$[0].duration", is(6)))
-                .andExpect(jsonPath("$[1].id", is(2)))
-                .andExpect(jsonPath("$[1].name", is("Web Application")))
-                .andExpect(jsonPath("$[1].duration", is(12)))
-                .andExpect(jsonPath("$[2].id", is(3)))
-                .andExpect(jsonPath("$[2].name", is("Data Analysis Tool")))
-                .andExpect(jsonPath("$[2].duration", is(8)));
+                .andExpect(jsonPath("$.data", hasSize(3)))
+                .andExpect(jsonPath("$.data[0].id", is(1)))
+                .andExpect(jsonPath("$.data[0].name", is("Mobile App Development")))
+                .andExpect(jsonPath("$.data[0].duration", is(6)))
+                .andExpect(jsonPath("$.data[1].id", is(2)))
+                .andExpect(jsonPath("$.data[1].name", is("Web Application")))
+                .andExpect(jsonPath("$.data[1].duration", is(12)))
+                .andExpect(jsonPath("$.data[2].id", is(3)))
+                .andExpect(jsonPath("$.data[2].name", is("Data Analysis Tool")))
+                .andExpect(jsonPath("$.data[2].duration", is(8)));
 
         verify(projectService, times(1)).getAllProjects();
     }
@@ -198,7 +198,7 @@ public class ProjectControllerTest {
         mockMvc.perform(get("/projects")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.data", hasSize(0)));
 
         verify(projectService, times(1)).getAllProjects();
     }
@@ -213,8 +213,8 @@ public class ProjectControllerTest {
         mockMvc.perform(get("/projects")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("Mobile App Development")));
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].name", is("Mobile App Development")));
 
         verify(projectService, times(1)).getAllProjects();
     }
@@ -237,9 +237,9 @@ public class ProjectControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("Mobile App Development - Phase 2")))
-                .andExpect(jsonPath("$.duration", is(8)));
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.name", is("Mobile App Development - Phase 2")))
+                .andExpect(jsonPath("$.data.duration", is(8)));
 
         verify(projectService, times(1)).updateProject(eq(1L), any(ProjectUpdateRequestDTO.class));
     }
@@ -262,7 +262,7 @@ public class ProjectControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.duration", is(10)));
+                .andExpect(jsonPath("$.data.duration", is(10)));
 
         verify(projectService, times(1)).updateProject(eq(1L), any(ProjectUpdateRequestDTO.class));
     }
@@ -285,7 +285,7 @@ public class ProjectControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("Mobile Application")));
+                .andExpect(jsonPath("$.data.name", is("Mobile Application")));
 
         verify(projectService, times(1)).updateProject(eq(1L), any(ProjectUpdateRequestDTO.class));
     }
@@ -308,9 +308,9 @@ public class ProjectControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(5)))
-                .andExpect(jsonPath("$.name", is("Enterprise System")))
-                .andExpect(jsonPath("$.duration", is(24)));
+                .andExpect(jsonPath("$.data.id", is(5)))
+                .andExpect(jsonPath("$.data.name", is("Enterprise System")))
+                .andExpect(jsonPath("$.data.duration", is(24)));
 
         verify(projectService, times(1)).updateProject(eq(5L), any(ProjectUpdateRequestDTO.class));
     }
@@ -322,7 +322,7 @@ public class ProjectControllerTest {
         mockMvc.perform(delete("/projects/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Project deleted successfully"));
+                .andExpect(jsonPath("$.message", is("Project deleted successfully")));
 
         verify(projectService, times(1)).deleteProject(1L);
     }
@@ -334,7 +334,7 @@ public class ProjectControllerTest {
         mockMvc.perform(delete("/projects/2")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Project deleted successfully"));
+                .andExpect(jsonPath("$.message", is("Project deleted successfully")));
 
         verify(projectService, times(1)).deleteProject(2L);
     }
@@ -356,8 +356,8 @@ public class ProjectControllerTest {
         mockMvc.perform(post("/projects")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(longNameRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("Very Long Project Name For Testing Purpose")));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.name", is("Very Long Project Name For Testing Purpose")));
 
         verify(projectService, times(1)).createProject(any(ProjectRequestDTO.class));
     }
@@ -397,12 +397,12 @@ public class ProjectControllerTest {
         mockMvc.perform(get("/projects")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(5)))
-                .andExpect(jsonPath("$[0].name", is("Mobile App Development")))
-                .andExpect(jsonPath("$[1].name", is("Web Application")))
-                .andExpect(jsonPath("$[2].name", is("Data Analysis Tool")))
-                .andExpect(jsonPath("$[3].name", is("Cloud Migration")))
-                .andExpect(jsonPath("$[4].name", is("Security Enhancement")));
+                .andExpect(jsonPath("$.data", hasSize(5)))
+                .andExpect(jsonPath("$.data[0].name", is("Mobile App Development")))
+                .andExpect(jsonPath("$.data[1].name", is("Web Application")))
+                .andExpect(jsonPath("$.data[2].name", is("Data Analysis Tool")))
+                .andExpect(jsonPath("$.data[3].name", is("Cloud Migration")))
+                .andExpect(jsonPath("$.data[4].name", is("Security Enhancement")));
 
         verify(projectService, times(1)).getAllProjects();
     }
@@ -425,8 +425,8 @@ public class ProjectControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("Mobile App Development")))
-                .andExpect(jsonPath("$.duration", is(6)));
+                .andExpect(jsonPath("$.data.name", is("Mobile App Development")))
+                .andExpect(jsonPath("$.data.duration", is(6)));
 
         verify(projectService, times(1)).updateProject(eq(1L), any(ProjectUpdateRequestDTO.class));
     }
@@ -522,7 +522,7 @@ public class ProjectControllerTest {
         mockMvc.perform(post("/projects")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(projectRequestDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         verify(projectService, times(1)).createProject(any(ProjectRequestDTO.class));
     }
@@ -568,9 +568,9 @@ public class ProjectControllerTest {
         mockMvc.perform(get("/projects/2")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(2)))
-                .andExpect(jsonPath("$.name", is("Web Platform")))
-                .andExpect(jsonPath("$.duration", is(14)));
+                .andExpect(jsonPath("$.data.id", is(2)))
+                .andExpect(jsonPath("$.data.name", is("Web Platform")))
+                .andExpect(jsonPath("$.data.duration", is(14)));
 
         verify(projectService, times(1)).getProjectById(2L);
     }

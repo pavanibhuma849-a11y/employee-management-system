@@ -71,12 +71,12 @@ public class EmployeeControllerTest {
         mockMvc.perform(post("/employees")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employeeRequestDTO)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("John Doe")))
-                .andExpect(jsonPath("$.role", is("Software Engineer")))
-                .andExpect(jsonPath("$.salary", is(75000.0)))
-                .andExpect(jsonPath("$.departmentName", is("Engineering")));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.name", is("John Doe")))
+                .andExpect(jsonPath("$.data.role", is("Software Engineer")))
+                .andExpect(jsonPath("$.data.salary", is(75000.0)))
+                .andExpect(jsonPath("$.data.departmentName", is("Engineering")));
 
         verify(employeeService, times(1)).createEmployee(any(EmployeeRequestDTO.class));
     }
@@ -89,11 +89,11 @@ public class EmployeeControllerTest {
         mockMvc.perform(get("/employees/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("John Doe")))
-                .andExpect(jsonPath("$.role", is("Software Engineer")))
-                .andExpect(jsonPath("$.salary", is(75000.0)))
-                .andExpect(jsonPath("$.departmentName", is("Engineering")));
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.name", is("John Doe")))
+                .andExpect(jsonPath("$.data.role", is("Software Engineer")))
+                .andExpect(jsonPath("$.data.salary", is(75000.0)))
+                .andExpect(jsonPath("$.data.departmentName", is("Engineering")));
 
         verify(employeeService, times(1)).getEmployeeById(1L);
     }
@@ -111,10 +111,10 @@ public class EmployeeControllerTest {
                 .param("size", "10")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.content[0].id", is(1)))
-                .andExpect(jsonPath("$.content[0].name", is("John Doe")))
-                .andExpect(jsonPath("$.totalElements", is(1)));
+                .andExpect(jsonPath("$.data.content", hasSize(1)))
+                .andExpect(jsonPath("$.data.content[0].id", is(1)))
+                .andExpect(jsonPath("$.data.content[0].name", is("John Doe")))
+                .andExpect(jsonPath("$.data.totalElements", is(1)));
 
         verify(employeeService, times(1)).getEmployees(null, PageRequest.of(0, 10));
     }
@@ -133,9 +133,9 @@ public class EmployeeControllerTest {
                 .param("size", "10")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.content[0].name", is("John Doe")))
-                .andExpect(jsonPath("$.content[0].departmentName", is("Engineering")));
+                .andExpect(jsonPath("$.data.content", hasSize(1)))
+                .andExpect(jsonPath("$.data.content[0].name", is("John Doe")))
+                .andExpect(jsonPath("$.data.content[0].departmentName", is("Engineering")));
 
         verify(employeeService, times(1)).getEmployees("Engineering", PageRequest.of(0, 10));
     }
@@ -152,8 +152,8 @@ public class EmployeeControllerTest {
                 .param("size", "10")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(0)))
-                .andExpect(jsonPath("$.totalElements", is(0)));
+                .andExpect(jsonPath("$.data.content", hasSize(0)))
+                .andExpect(jsonPath("$.data.totalElements", is(0)));
 
         verify(employeeService, times(1)).getEmployees(null, PageRequest.of(0, 10));
     }
@@ -251,9 +251,9 @@ public class EmployeeControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.role", is("Senior Software Engineer")))
-                .andExpect(jsonPath("$.salary", is(95000.0)));
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.role", is("Senior Software Engineer")))
+                .andExpect(jsonPath("$.data.salary", is(95000.0)));
 
         verify(employeeService, times(1)).updateEmployee(eq(1L), any(EmployeeUpdateRequestDTO.class));
     }
@@ -265,7 +265,7 @@ public class EmployeeControllerTest {
         mockMvc.perform(delete("/employees/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Employee deleted successfully"));
+                .andExpect(jsonPath("$.message", is("Employee deleted successfully")));
 
         verify(employeeService, times(1)).deleteEmployee(1L);
     }
@@ -306,11 +306,11 @@ public class EmployeeControllerTest {
                 .param("size", "10")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(3)))
-                .andExpect(jsonPath("$.content[0].name", is("John Doe")))
-                .andExpect(jsonPath("$.content[1].name", is("Jane Smith")))
-                .andExpect(jsonPath("$.content[2].name", is("Bob Johnson")))
-                .andExpect(jsonPath("$.totalElements", is(3)));
+                .andExpect(jsonPath("$.data.content", hasSize(3)))
+                .andExpect(jsonPath("$.data.content[0].name", is("John Doe")))
+                .andExpect(jsonPath("$.data.content[1].name", is("Jane Smith")))
+                .andExpect(jsonPath("$.data.content[2].name", is("Bob Johnson")))
+                .andExpect(jsonPath("$.data.totalElements", is(3)));
 
         verify(employeeService, times(1)).getEmployees(null, PageRequest.of(0, 10));
     }
@@ -403,8 +403,7 @@ public class EmployeeControllerTest {
         mockMvc.perform(post("/employees")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employeeRequestDTO)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(""));
+                .andExpect(status().isCreated());
 
         verify(employeeService, times(1)).createEmployee(any(EmployeeRequestDTO.class));
     }
@@ -423,9 +422,9 @@ public class EmployeeControllerTest {
         mockMvc.perform(get("/employees/2")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(2)))
-                .andExpect(jsonPath("$.name", is("Jane Smith")))
-                .andExpect(jsonPath("$.role", is("Manager")));
+                .andExpect(jsonPath("$.data.id", is(2)))
+                .andExpect(jsonPath("$.data.name", is("Jane Smith")))
+                .andExpect(jsonPath("$.data.role", is("Manager")));
 
         verify(employeeService, times(1)).getEmployeeById(2L);
     }
@@ -450,7 +449,7 @@ public class EmployeeControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.departmentName", is("R&D")));
+                .andExpect(jsonPath("$.data.departmentName", is("R&D")));
 
         verify(employeeService, times(1)).updateEmployee(eq(1L), any(EmployeeUpdateRequestDTO.class));
     }
@@ -462,7 +461,7 @@ public class EmployeeControllerTest {
         mockMvc.perform(delete("/employees/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Employee deleted successfully"));
+                .andExpect(jsonPath("$.message", is("Employee deleted successfully")));
 
         verify(employeeService, times(1)).deleteEmployee(1L);
     }

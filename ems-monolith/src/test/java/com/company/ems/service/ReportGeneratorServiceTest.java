@@ -51,9 +51,14 @@ public class ReportGeneratorServiceTest {
 
         try {
             reportGeneratorService.generateMonthlyReport();
-            String output = outContent.toString();
-            assertTrue(output.contains("Monthly report generated successfully."), 
-                "Expected success message in console output");
+            
+            await()
+                .atMost(Duration.ofSeconds(5))
+                .untilAsserted(() -> {
+                    String output = outContent.toString();
+                    assertTrue(output.contains("Monthly report generated successfully."), 
+                        "Expected success message in console output");
+                });
         } finally {
             System.setOut(originalOut);
         }

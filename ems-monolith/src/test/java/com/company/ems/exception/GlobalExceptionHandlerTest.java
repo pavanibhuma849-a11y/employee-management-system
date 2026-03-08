@@ -1,5 +1,6 @@
 package com.company.ems.exception;
 
+import com.company.ems.dto.ApiResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,6 @@ import org.springframework.core.MethodParameter;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,22 +28,24 @@ public class GlobalExceptionHandlerTest {
         webRequest = new ServletWebRequest(request);
     }
 
+    @SuppressWarnings("unused")
+    private void dummyMethod(String param) {}
+
     @Test
     @SuppressWarnings("unchecked")
     public void testHandleEmployeeNotFoundException() {
         String message = "Employee not found with id: 1";
         EmployeeNotFoundException exception = new EmployeeNotFoundException(message);
 
-        ResponseEntity<?> response = globalExceptionHandler.handleNotFoundException(exception, webRequest);
+        ResponseEntity<ApiResponse<Object>> response = (ResponseEntity<ApiResponse<Object>>) globalExceptionHandler.handleNotFoundException(exception, webRequest);
 
         assertNotNull(response);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        Map<String, Object> body = (Map<String, Object>) response.getBody();
-        assertEquals(message, body.get("message"));
-        assertNotNull(body.get("timestamp"));
-        assertTrue(body.get("timestamp") instanceof LocalDateTime);
+        ApiResponse<Object> body = response.getBody();
+        assertEquals(message, body.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND.value(), body.getStatus());
     }
 
     @Test
@@ -52,15 +54,14 @@ public class GlobalExceptionHandlerTest {
         String message = "Department not found with id: 5";
         DepartmentNotFoundException exception = new DepartmentNotFoundException(message);
 
-        ResponseEntity<?> response = globalExceptionHandler.handleNotFoundException(exception, webRequest);
+        ResponseEntity<ApiResponse<Object>> response = (ResponseEntity<ApiResponse<Object>>) globalExceptionHandler.handleNotFoundException(exception, webRequest);
 
         assertNotNull(response);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        Map<String, Object> body = (Map<String, Object>) response.getBody();
-        assertEquals(message, body.get("message"));
-        assertNotNull(body.get("timestamp"));
+        ApiResponse<Object> body = response.getBody();
+        assertEquals(message, body.getMessage());
     }
 
     @Test
@@ -69,15 +70,14 @@ public class GlobalExceptionHandlerTest {
         String message = "Project not found with id: 10";
         ProjectNotFoundException exception = new ProjectNotFoundException(message);
 
-        ResponseEntity<?> response = globalExceptionHandler.handleNotFoundException(exception, webRequest);
+        ResponseEntity<ApiResponse<Object>> response = (ResponseEntity<ApiResponse<Object>>) globalExceptionHandler.handleNotFoundException(exception, webRequest);
 
         assertNotNull(response);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        Map<String, Object> body = (Map<String, Object>) response.getBody();
-        assertEquals(message, body.get("message"));
-        assertNotNull(body.get("timestamp"));
+        ApiResponse<Object> body = response.getBody();
+        assertEquals(message, body.getMessage());
     }
 
     @Test
@@ -86,15 +86,14 @@ public class GlobalExceptionHandlerTest {
         String message = "Invalid project duration";
         InvalidProjectDurationException exception = new InvalidProjectDurationException(message);
 
-        ResponseEntity<?> response = globalExceptionHandler.handleBadRequestException(exception, webRequest);
+        ResponseEntity<ApiResponse<Object>> response = (ResponseEntity<ApiResponse<Object>>) globalExceptionHandler.handleBadRequestException(exception, webRequest);
 
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        Map<String, Object> body = (Map<String, Object>) response.getBody();
-        assertEquals(message, body.get("message"));
-        assertNotNull(body.get("timestamp"));
+        ApiResponse<Object> body = response.getBody();
+        assertEquals(message, body.getMessage());
     }
 
     @Test
@@ -110,16 +109,15 @@ public class GlobalExceptionHandlerTest {
         MethodArgumentNotValidException exception =
                 new MethodArgumentNotValidException(methodParameter, bindingResult);
 
-        ResponseEntity<?> response = globalExceptionHandler.handleValidationException(exception);
+        ResponseEntity<ApiResponse<Map<String, String>>> response = (ResponseEntity<ApiResponse<Map<String, String>>>) globalExceptionHandler.handleValidationException(exception);
 
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
-        Map<String, Object> body = (Map<String, Object>) response.getBody();
-        assertEquals("Validation failed", body.get("message"));
-        assertNotNull(body.get("timestamp"));
+        ApiResponse<Map<String, String>> body = response.getBody();
+        assertEquals("Validation failed", body.getMessage());
 
-        Map<String, String> errors = (Map<String, String>) body.get("errors");
+        Map<String, String> errors = body.getData();
         assertEquals(2, errors.size());
         assertEquals("must not be null", errors.get("field1"));
         assertEquals("must be positive", errors.get("field2"));
@@ -131,15 +129,14 @@ public class GlobalExceptionHandlerTest {
         String message = "An unexpected error occurred";
         Exception exception = new Exception(message);
 
-        ResponseEntity<?> response = globalExceptionHandler.handleGlobalException(exception, webRequest);
+        ResponseEntity<ApiResponse<Object>> response = (ResponseEntity<ApiResponse<Object>>) globalExceptionHandler.handleGlobalException(exception, webRequest);
 
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        Map<String, Object> body = (Map<String, Object>) response.getBody();
-        assertEquals(message, body.get("message"));
-        assertNotNull(body.get("timestamp"));
+        ApiResponse<Object> body = response.getBody();
+        assertEquals(message, body.getMessage());
     }
 
     @Test
@@ -148,15 +145,14 @@ public class GlobalExceptionHandlerTest {
         String message = "Runtime error";
         RuntimeException exception = new RuntimeException(message);
 
-        ResponseEntity<?> response = globalExceptionHandler.handleGlobalException(exception, webRequest);
+        ResponseEntity<ApiResponse<Object>> response = (ResponseEntity<ApiResponse<Object>>) globalExceptionHandler.handleGlobalException(exception, webRequest);
 
         assertNotNull(response);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
 
-        Map<String, Object> body = (Map<String, Object>) response.getBody();
-        assertEquals(message, body.get("message"));
-        assertNotNull(body.get("timestamp"));
+        ApiResponse<Object> body = response.getBody();
+        assertEquals(message, body.getMessage());
     }
 
     @Test
@@ -170,11 +166,11 @@ public class GlobalExceptionHandlerTest {
 
         for (String message : messages) {
             EmployeeNotFoundException exception = new EmployeeNotFoundException(message);
-            ResponseEntity<?> response = globalExceptionHandler.handleNotFoundException(exception, webRequest);
+            ResponseEntity<ApiResponse<Object>> response = (ResponseEntity<ApiResponse<Object>>) globalExceptionHandler.handleNotFoundException(exception, webRequest);
 
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-            Map<String, Object> body = (Map<String, Object>) response.getBody();
-            assertEquals(message, body.get("message"));
+            ApiResponse<Object> body = response.getBody();
+            assertEquals(message, body.getMessage());
         }
     }
 
@@ -183,12 +179,11 @@ public class GlobalExceptionHandlerTest {
     public void testHandleNotFoundExceptionResponseStructure() {
         EmployeeNotFoundException exception = new EmployeeNotFoundException("Test message");
 
-        ResponseEntity<?> response = globalExceptionHandler.handleNotFoundException(exception, webRequest);
-        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        ResponseEntity<ApiResponse<Object>> response = (ResponseEntity<ApiResponse<Object>>) globalExceptionHandler.handleNotFoundException(exception, webRequest);
+        ApiResponse<Object> body = response.getBody();
 
-        assertTrue(body.containsKey("timestamp"));
-        assertTrue(body.containsKey("message"));
-        assertEquals(2, body.size());
+        assertNotNull(body.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND.value(), body.getStatus());
     }
 
     @Test
@@ -196,12 +191,11 @@ public class GlobalExceptionHandlerTest {
     public void testHandleGlobalExceptionResponseStructure() {
         Exception exception = new Exception("Test error");
 
-        ResponseEntity<?> response = globalExceptionHandler.handleGlobalException(exception, webRequest);
-        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        ResponseEntity<ApiResponse<Object>> response = (ResponseEntity<ApiResponse<Object>>) globalExceptionHandler.handleGlobalException(exception, webRequest);
+        ApiResponse<Object> body = response.getBody();
 
-        assertTrue(body.containsKey("timestamp"));
-        assertTrue(body.containsKey("message"));
-        assertEquals(2, body.size());
+        assertNotNull(body.getMessage());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), body.getStatus());
     }
 
     @Test

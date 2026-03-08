@@ -1,6 +1,7 @@
 package com.company.ems.controller;
 
 import com.company.ems.dto.ApiResponse;
+import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.dto.ProjectRequestDTO;
 import com.company.ems.dto.ProjectResponseDTO;
 import com.company.ems.dto.ProjectUpdateRequestDTO;
@@ -53,6 +54,27 @@ public class ProjectController {
     public ResponseEntity<ApiResponse<Void>> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
         ApiResponse<Void> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), null, "Project deleted successfully");
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PostMapping("/{id}/employees/{empId}")
+    public ResponseEntity<ApiResponse<Void>> assignEmployeeToProject(@PathVariable Long id, @PathVariable Long empId) {
+        projectService.assignEmployeeToProject(id, empId);
+        ApiResponse<Void> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), null, "Employee assigned to project successfully");
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @DeleteMapping("/{id}/employees/{empId}")
+    public ResponseEntity<ApiResponse<Void>> removeEmployeeFromProject(@PathVariable Long id, @PathVariable Long empId) {
+        projectService.removeEmployeeFromProject(id, empId);
+        ApiResponse<Void> apiResponse = new ApiResponse<>(HttpStatus.NO_CONTENT.value(), null, "Employee removed from project successfully");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
+    }
+
+    @GetMapping("/{id}/employees")
+    public ResponseEntity<ApiResponse<List<EmployeeResponseDTO>>> getEmployeesByProject(@PathVariable Long id) {
+        List<EmployeeResponseDTO> response = projectService.getEmployeesByProjectId(id);
+        ApiResponse<List<EmployeeResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Employees fetched successfully for project");
         return ResponseEntity.ok(apiResponse);
     }
 }

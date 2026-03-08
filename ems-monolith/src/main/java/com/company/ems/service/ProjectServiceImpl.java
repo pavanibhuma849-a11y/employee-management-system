@@ -1,11 +1,14 @@
 package com.company.ems.service;
 
+import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.dto.ProjectRequestDTO;
 import com.company.ems.dto.ProjectResponseDTO;
 import com.company.ems.dto.ProjectUpdateRequestDTO;
+import com.company.ems.exception.DuplicateResourceException;
 import com.company.ems.exception.EmployeeNotFoundException;
 import com.company.ems.exception.InvalidProjectDurationException;
 import com.company.ems.exception.ProjectNotFoundException;
+import com.company.ems.exception.ResourceConflictException;
 import com.company.ems.model.Employee;
 import com.company.ems.model.Project;
 import com.company.ems.repository.EmployeeRepository;
@@ -135,14 +138,65 @@ public class ProjectServiceImpl implements IProjectService {
             Employee employee = employeeRepository.findById(employeeId)
                     .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + employeeId));
 
+            if (employee.getProjects().contains(project)) {
+                throw new DuplicateResourceException("Employee already assigned to this project");
+            }
+
             employee.getProjects().add(project);
             employeeRepository.save(employee);
             logger.info("Employee with id {} successfully assigned to project with id {}", employeeId, projectId);
-        } catch (ProjectNotFoundException | EmployeeNotFoundException ex) {
+        } catch (ProjectNotFoundException | EmployeeNotFoundException | DuplicateResourceException ex) {
             logger.warn("Error assigning employee to project: {}", ex.getMessage());
             throw ex;
         } catch (Exception ex) {
             logger.error("Error assigning employee with id {} to project with id {}: {}", employeeId, projectId, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public void removeEmployeeFromProject(Long projectId, Long employeeId) {
+        try {
+            logger.debug("Removing employee with id {} from project with id {}", employeeId, projectId);
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new ProjectNotFoundException("Project not found with id: " + projectId));
+            Employee employee = employeeRepository.findById(employeeId)
+                    .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + employeeId));
+
+            if (!employee.getProjects().contains(project)) {
+                throw new ResourceConflictException("Employee is not assigned to this project");
+            }
+
+            employee.getProjects().remove(project);
+            employeeRepository.save(employee);
+            logger.info("Employee with id {} successfully removed from project with id {}", employeeId, projectId);
+        } catch (ProjectNotFoundException | EmployeeNotFoundException | ResourceConflictException ex) {
+            logger.warn("Error removing employee from project: {}", ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error removing employee with id {} from project with id {}: {}", employeeId, projectId, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public List<EmployeeResponseDTO> getEmployeesByProjectId(Long projectId) {
+        try {
+            logger.debug("Fetching employees for project with id: {}", projectId);
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new ProjectNotFoundException("Project not found with id: " + projectId));
+            
+            List<EmployeeResponseDTO> employees = project.getEmployees().stream()
+                    .map(this::mapEmployeeToResponseDTO)
+                    .collect(Collectors.toList());
+            
+            logger.info("Employees fetched for project with id {} - total: {}", projectId, employees.size());
+            return employees;
+        } catch (ProjectNotFoundException ex) {
+            logger.warn("Project not found with id: {}", projectId);
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error fetching employees for project with id {}: {}", projectId, ex.getMessage(), ex);
             throw ex;
         }
     }
@@ -156,6 +210,31 @@ public class ProjectServiceImpl implements IProjectService {
             return dto;
         } catch (Exception ex) {
             logger.error("Error mapping Project to ProjectResponseDTO: {}", ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    private EmployeeResponseDTO mapEmployeeToResponseDTO(Employee employee) {
+        try {
+            EmployeeResponseDTO dto = new EmployeeResponseDTO();
+            dto.setId(employee.getId());
+            dto.setName(employee.getName());
+            dto.setRole(employee.getRole());
+            dto.setSalary(employee.getSalary());
+            dto.setJoiningDate(employee.getJoiningDate());
+            dto.setCreatedAt(employee.getCreatedAt());
+            dto.setUpdatedAt(employee.getUpdatedAt());
+            if (employee.getDepartment() != null) {
+                dto.setDepartmentName(employee.getDepartment().getName());
+            }
+            if (employee.getProjects() != null) {
+                dto.setProjectNames(employee.getProjects().stream()
+                        .map(Project::getName)
+                        .collect(Collectors.toSet()));
+            }
+            return dto;
+        } catch (Exception ex) {
+            logger.error("Error mapping Employee to EmployeeResponseDTO: {}", ex.getMessage(), ex);
             throw ex;
         }
     }

@@ -58,9 +58,9 @@ public class DepartmentControllerTest {
         mockMvc.perform(post("/departments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(departmentRequestDTO)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("IT")));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.name", is("IT")));
 
         verify(departmentService, times(1)).createDepartment(any(DepartmentRequestDTO.class));
     }
@@ -80,9 +80,9 @@ public class DepartmentControllerTest {
         mockMvc.perform(post("/departments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(hrRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(2)))
-                .andExpect(jsonPath("$.name", is("HR")));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.id", is(2)))
+                .andExpect(jsonPath("$.data.name", is("HR")));
 
         verify(departmentService, times(1)).createDepartment(any(DepartmentRequestDTO.class));
     }
@@ -95,8 +95,8 @@ public class DepartmentControllerTest {
         mockMvc.perform(get("/departments/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("IT")));
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.name", is("IT")));
 
         verify(departmentService, times(1)).getDepartmentById(1L);
     }
@@ -113,8 +113,8 @@ public class DepartmentControllerTest {
         mockMvc.perform(get("/departments/3")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(3)))
-                .andExpect(jsonPath("$.name", is("Finance")));
+                .andExpect(jsonPath("$.data.id", is(3)))
+                .andExpect(jsonPath("$.data.name", is("Finance")));
 
         verify(departmentService, times(1)).getDepartmentById(3L);
     }
@@ -141,13 +141,13 @@ public class DepartmentControllerTest {
         mockMvc.perform(get("/departments")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[0].name", is("IT")))
-                .andExpect(jsonPath("$[1].id", is(2)))
-                .andExpect(jsonPath("$[1].name", is("HR")))
-                .andExpect(jsonPath("$[2].id", is(3)))
-                .andExpect(jsonPath("$[2].name", is("Finance")));
+                .andExpect(jsonPath("$.data", hasSize(3)))
+                .andExpect(jsonPath("$.data[0].id", is(1)))
+                .andExpect(jsonPath("$.data[0].name", is("IT")))
+                .andExpect(jsonPath("$.data[1].id", is(2)))
+                .andExpect(jsonPath("$.data[1].name", is("HR")))
+                .andExpect(jsonPath("$.data[2].id", is(3)))
+                .andExpect(jsonPath("$.data[2].name", is("Finance")));
 
         verify(departmentService, times(1)).getAllDepartments();
     }
@@ -160,7 +160,7 @@ public class DepartmentControllerTest {
         mockMvc.perform(get("/departments")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.data", hasSize(0)));
 
         verify(departmentService, times(1)).getAllDepartments();
     }
@@ -175,8 +175,8 @@ public class DepartmentControllerTest {
         mockMvc.perform(get("/departments")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("IT")));
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].name", is("IT")));
 
         verify(departmentService, times(1)).getAllDepartments();
     }
@@ -197,8 +197,8 @@ public class DepartmentControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("Information Technology")));
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.name", is("Information Technology")));
 
         verify(departmentService, times(1)).updateDepartment(eq(1L), any(DepartmentUpdateRequestDTO.class));
     }
@@ -219,7 +219,7 @@ public class DepartmentControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("IT Department")));
+                .andExpect(jsonPath("$.data.name", is("IT Department")));
 
         verify(departmentService, times(1)).updateDepartment(eq(1L), any(DepartmentUpdateRequestDTO.class));
     }
@@ -240,8 +240,8 @@ public class DepartmentControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(2)))
-                .andExpect(jsonPath("$.name", is("Human Resources")));
+                .andExpect(jsonPath("$.data.id", is(2)))
+                .andExpect(jsonPath("$.data.name", is("Human Resources")));
 
         verify(departmentService, times(1)).updateDepartment(eq(2L), any(DepartmentUpdateRequestDTO.class));
     }
@@ -253,7 +253,7 @@ public class DepartmentControllerTest {
         mockMvc.perform(delete("/departments/1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Department deleted successfully"));
+                .andExpect(jsonPath("$.message", is("Department deleted successfully")));
 
         verify(departmentService, times(1)).deleteDepartment(1L);
     }
@@ -265,7 +265,7 @@ public class DepartmentControllerTest {
         mockMvc.perform(delete("/departments/2")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Department deleted successfully"));
+                .andExpect(jsonPath("$.message", is("Department deleted successfully")));
 
         verify(departmentService, times(1)).deleteDepartment(2L);
     }
@@ -311,11 +311,11 @@ public class DepartmentControllerTest {
         mockMvc.perform(get("/departments")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[0].name", is("IT")))
-                .andExpect(jsonPath("$[1].name", is("HR")))
-                .andExpect(jsonPath("$[2].name", is("Finance")))
-                .andExpect(jsonPath("$[3].name", is("Operations")));
+                .andExpect(jsonPath("$.data", hasSize(4)))
+                .andExpect(jsonPath("$.data[0].name", is("IT")))
+                .andExpect(jsonPath("$.data[1].name", is("HR")))
+                .andExpect(jsonPath("$.data[2].name", is("Finance")))
+                .andExpect(jsonPath("$.data[3].name", is("Operations")));
 
         verify(departmentService, times(1)).getAllDepartments();
     }
@@ -393,7 +393,7 @@ public class DepartmentControllerTest {
         mockMvc.perform(post("/departments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(departmentRequestDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         verify(departmentService, times(1)).createDepartment(any(DepartmentRequestDTO.class));
     }
