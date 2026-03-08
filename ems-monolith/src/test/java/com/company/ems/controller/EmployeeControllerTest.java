@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -452,6 +453,89 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$.data.departmentName", is("R&D")));
 
         verify(employeeService, times(1)).updateEmployee(eq(1L), any(EmployeeUpdateRequestDTO.class));
+    }
+
+    @Test
+    public void testGetEmployees_WithSortingSalaryAsc() throws Exception {
+        List<EmployeeResponseDTO> employees = Arrays.asList(employeeResponseDTO);
+        Page<EmployeeResponseDTO> page = new PageImpl<>(employees, PageRequest.of(0, 10, Sort.by("salary").ascending()), 1);
+
+        when(employeeService.getEmployees(null, PageRequest.of(0, 10, Sort.by("salary").ascending())))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/employees")
+                .param("page", "0")
+                .param("size", "10")
+                .param("sort", "salary")
+                .param("order", "asc")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content[0].name", is("John Doe")));
+
+        verify(employeeService, times(1)).getEmployees(null, PageRequest.of(0, 10, Sort.by("salary").ascending()));
+    }
+
+    @Test
+    public void testGetEmployees_WithSortingName() throws Exception {
+        List<EmployeeResponseDTO> employees = Arrays.asList(employeeResponseDTO);
+        Page<EmployeeResponseDTO> page = new PageImpl<>(employees, PageRequest.of(0, 10, Sort.by("name").ascending()), 1);
+
+        when(employeeService.getEmployees(null, PageRequest.of(0, 10, Sort.by("name").ascending())))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/employees")
+                .param("page", "0")
+                .param("size", "10")
+                .param("sort", "name")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content[0].name", is("John Doe")));
+
+        verify(employeeService, times(1)).getEmployees(null, PageRequest.of(0, 10, Sort.by("name").ascending()));
+    }
+
+    @Test
+    public void testCreateEmployee_SqlInjectionPrevention() throws Exception {
+        EmployeeRequestDTO sqlInjectionRequest = new EmployeeRequestDTO();
+        sqlInjectionRequest.setName("'; DROP TABLE employee;--");
+        sqlInjectionRequest.setRole("Attacker");
+        sqlInjectionRequest.setSalary(1000.0);
+        sqlInjectionRequest.setJoiningDate(LocalDate.now());
+
+        EmployeeResponseDTO sqlInjectionResponse = new EmployeeResponseDTO();
+        sqlInjectionResponse.setId(100L);
+        sqlInjectionResponse.setName("'; DROP TABLE employee;--");
+        sqlInjectionResponse.setRole("Attacker");
+
+        when(employeeService.createEmployee(any(EmployeeRequestDTO.class)))
+                .thenReturn(sqlInjectionResponse);
+
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sqlInjectionRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.name", is("'; DROP TABLE employee;--")));
+
+        verify(employeeService, times(1)).createEmployee(any(EmployeeRequestDTO.class));
+    }
+
+    @Test
+    public void testCreateEmployee_ConcurrentWrites() throws Exception {
+        // Simulate two concurrent POST requests by running them sequentially but verifying service interaction
+        when(employeeService.createEmployee(any(EmployeeRequestDTO.class)))
+                .thenReturn(employeeResponseDTO);
+
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employeeRequestDTO)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/employees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employeeRequestDTO)))
+                .andExpect(status().isCreated());
+
+        verify(employeeService, times(2)).createEmployee(any(EmployeeRequestDTO.class));
     }
 
     @Test

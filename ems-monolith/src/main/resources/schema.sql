@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS project (
 
 -- Employee_Project Junction Table (Many-to-Many)
 CREATE TABLE IF NOT EXISTS employee_project (
-    employee_id INT REFERENCES employee(id),
-    project_id INT REFERENCES project(id),
+    employee_id INT REFERENCES employee(id) ON DELETE CASCADE,
+    project_id INT REFERENCES project(id) ON DELETE CASCADE,
     PRIMARY KEY (employee_id, project_id)
 );

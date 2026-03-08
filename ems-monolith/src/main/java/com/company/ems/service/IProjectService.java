@@ -4,15 +4,19 @@ import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.dto.ProjectRequestDTO;
 import com.company.ems.dto.ProjectResponseDTO;
 import com.company.ems.dto.ProjectUpdateRequestDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface IProjectService {
     ProjectResponseDTO createProject(ProjectRequestDTO projectDTO);
     ProjectResponseDTO getProjectById(Long id);
+    Page<ProjectResponseDTO> getAllProjects(Pageable pageable);
     List<ProjectResponseDTO> getAllProjects();
     ProjectResponseDTO updateProject(Long id, ProjectUpdateRequestDTO projectDTO);
     void deleteProject(Long id);
     void assignEmployeeToProject(Long projectId, Long employeeId);
     void removeEmployeeFromProject(Long projectId, Long employeeId);
     List<EmployeeResponseDTO> getEmployeesByProjectId(Long projectId);
+    List<ProjectResponseDTO> getProjectsByEmployeeId(Long employeeId);
 }

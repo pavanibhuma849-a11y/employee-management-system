@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,15 +61,31 @@ public class DepartmentController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<DepartmentResponseDTO>>> getAllDepartments() {
+    public ResponseEntity<ApiResponse<Page<DepartmentResponseDTO>>> getAllDepartments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         try {
-            logger.info("Fetching all departments");
+            logger.info("Fetching paginated departments - page: {}, size: {}", page, size);
+            Page<DepartmentResponseDTO> response = departmentService.getAllDepartments(PageRequest.of(page, size));
+            logger.info("Departments fetched successfully - total elements: {}", response.getTotalElements());
+            ApiResponse<Page<DepartmentResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Departments fetched successfully");
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception ex) {
+            logger.error("Error fetching all departments: {}", ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<DepartmentResponseDTO>>> getAllDepartmentsList() {
+        try {
+            logger.info("Fetching all departments as list");
             List<DepartmentResponseDTO> response = departmentService.getAllDepartments();
             logger.info("Departments fetched successfully - total: {}", response.size());
             ApiResponse<List<DepartmentResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Departments fetched successfully");
             return ResponseEntity.ok(apiResponse);
         } catch (Exception ex) {
-            logger.error("Error fetching all departments: {}", ex.getMessage(), ex);
+            logger.error("Error fetching all departments list: {}", ex.getMessage(), ex);
             throw ex;
         }
     }

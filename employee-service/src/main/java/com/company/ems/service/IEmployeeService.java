@@ -12,6 +12,7 @@ public interface IEmployeeService {
     EmployeeResponseDTO createEmployee(EmployeeRequestDTO employeeDTO);
     EmployeeResponseDTO getEmployeeById(Long id);
     Page<EmployeeResponseDTO> getEmployees(String departmentName, Pageable pageable);
+    Page<EmployeeResponseDTO> getEmployeesByDepartmentId(Long departmentId, Pageable pageable);
     EmployeeResponseDTO updateEmployee(Long id, EmployeeUpdateRequestDTO employeeDTO);
     void deleteEmployee(Long id);
     List<EmployeeResponseDTO> getAllEmployeesSortedByNameAndDate();

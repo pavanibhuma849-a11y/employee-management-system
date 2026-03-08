@@ -106,6 +106,16 @@ public class ProjectServiceImpl implements IProjectService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ProjectResponseDTO> getProjectsByEmployeeId(Long employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + employeeId));
+
+        return employee.getProjects().stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     private ProjectResponseDTO mapToResponseDTO(Project project) {
         ProjectResponseDTO dto = new ProjectResponseDTO();
         dto.setId(project.getId());

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,11 +63,25 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<ApiResponse<Page<EmployeeResponseDTO>>> getEmployees(
             @RequestParam(required = false) String department,
+            @RequestParam(required = false) Long departmentId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort,
+            @RequestParam(defaultValue = "asc") String order) {
         try {
-            logger.info("Fetching employees - department: {}, page: {}, size: {}", department, page, size);
-            Page<EmployeeResponseDTO> response = employeeService.getEmployees(department, PageRequest.of(page, size));
+            logger.info("Fetching employees - department: {}, departmentId: {}, page: {}, size: {}, sort: {}, order: {}", department, departmentId, page, size, sort, order);
+            
+            Sort sorting = Sort.unsorted();
+            if (sort != null && !sort.isEmpty()) {
+                sorting = order.equalsIgnoreCase("desc") ? Sort.by(sort).descending() : Sort.by(sort).ascending();
+            }
+
+            Page<EmployeeResponseDTO> response;
+            if (departmentId != null) {
+                response = employeeService.getEmployeesByDepartmentId(departmentId, PageRequest.of(page, size, sorting));
+            } else {
+                response = employeeService.getEmployees(department, PageRequest.of(page, size, sorting));
+            }
             logger.info("Employees fetched successfully - total elements: {}", response.getTotalElements());
             ApiResponse<Page<EmployeeResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Employees fetched successfully");
             return ResponseEntity.ok(apiResponse);

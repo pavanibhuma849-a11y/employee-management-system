@@ -12,6 +12,8 @@ import com.company.ems.model.Employee;
 import com.company.ems.model.Project;
 import com.company.ems.repository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +40,11 @@ public class DepartmentServiceImpl implements IDepartmentService {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new DepartmentNotFoundException("Department not found with id: " + id));
         return mapToResponseDTO(department);
+    }
+
+    @Override
+    public Page<DepartmentResponseDTO> getAllDepartments(Pageable pageable) {
+        return departmentRepository.findAll(pageable).map(this::mapToResponseDTO);
     }
 
     @Override

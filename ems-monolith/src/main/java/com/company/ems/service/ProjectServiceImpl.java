@@ -16,6 +16,8 @@ import com.company.ems.repository.ProjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,6 +70,19 @@ public class ProjectServiceImpl implements IProjectService {
             throw ex;
         } catch (Exception ex) {
             logger.error("Error fetching project with id {}: {}", id, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public Page<ProjectResponseDTO> getAllProjects(Pageable pageable) {
+        try {
+            logger.debug("Fetching paginated projects - page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
+            Page<Project> projects = projectRepository.findAll(pageable);
+            logger.info("All projects fetched successfully - total elements: {}", projects.getTotalElements());
+            return projects.map(this::mapToResponseDTO);
+        } catch (Exception ex) {
+            logger.error("Error fetching all projects: {}", ex.getMessage(), ex);
             throw ex;
         }
     }
@@ -197,6 +212,28 @@ public class ProjectServiceImpl implements IProjectService {
             throw ex;
         } catch (Exception ex) {
             logger.error("Error fetching employees for project with id {}: {}", projectId, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public List<ProjectResponseDTO> getProjectsByEmployeeId(Long employeeId) {
+        try {
+            logger.debug("Fetching projects for employee with id: {}", employeeId);
+            Employee employee = employeeRepository.findById(employeeId)
+                    .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + employeeId));
+            
+            List<ProjectResponseDTO> projects = employee.getProjects().stream()
+                    .map(this::mapToResponseDTO)
+                    .collect(Collectors.toList());
+            
+            logger.info("Projects fetched for employee with id {} - total: {}", employeeId, projects.size());
+            return projects;
+        } catch (EmployeeNotFoundException ex) {
+            logger.warn("Employee not found with id: {}", employeeId);
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error fetching projects for employee with id {}: {}", employeeId, ex.getMessage(), ex);
             throw ex;
         }
     }

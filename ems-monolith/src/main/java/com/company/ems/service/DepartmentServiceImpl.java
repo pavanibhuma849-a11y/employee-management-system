@@ -14,6 +14,8 @@ import com.company.ems.repository.DepartmentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.TreeSet;
@@ -63,6 +65,19 @@ public class DepartmentServiceImpl implements IDepartmentService {
             throw ex;
         } catch (Exception ex) {
             logger.error("Error fetching department with id {}: {}", id, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public Page<DepartmentResponseDTO> getAllDepartments(Pageable pageable) {
+        try {
+            logger.debug("Fetching paginated departments - page: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
+            Page<Department> departments = departmentRepository.findAll(pageable);
+            logger.info("All departments fetched successfully - total elements: {}", departments.getTotalElements());
+            return departments.map(this::mapToResponseDTO);
+        } catch (Exception ex) {
+            logger.error("Error fetching all departments: {}", ex.getMessage(), ex);
             throw ex;
         }
     }

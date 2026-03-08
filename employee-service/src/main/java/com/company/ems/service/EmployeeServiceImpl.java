@@ -62,6 +62,12 @@ public class EmployeeServiceImpl implements IEmployeeService {
     }
 
     @Override
+    public Page<EmployeeResponseDTO> getEmployeesByDepartmentId(Long departmentId, Pageable pageable) {
+        Page<Employee> employees = employeeRepository.findByDepartmentId(departmentId, pageable);
+        return employees.map(this::mapToResponseDTO);
+    }
+
+    @Override
     public EmployeeResponseDTO updateEmployee(Long id, EmployeeUpdateRequestDTO employeeDTO) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));

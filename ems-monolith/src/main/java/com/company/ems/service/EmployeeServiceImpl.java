@@ -89,6 +89,19 @@ public class EmployeeServiceImpl implements IEmployeeService {
     }
 
     @Override
+    public Page<EmployeeResponseDTO> getEmployeesByDepartmentId(Long departmentId, Pageable pageable) {
+        try {
+            logger.debug("Fetching employees by departmentId: {}, page: {}, size: {}", departmentId, pageable.getPageNumber(), pageable.getPageSize());
+            Page<Employee> employees = employeeRepository.findByDepartmentId(departmentId, pageable);
+            logger.info("Employees fetched by departmentId: {} - total: {}", departmentId, employees.getTotalElements());
+            return employees.map(this::mapToResponseDTO);
+        } catch (Exception ex) {
+            logger.error("Error fetching employees by departmentId {}: {}", departmentId, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @Override
     public EmployeeResponseDTO updateEmployee(Long id, EmployeeUpdateRequestDTO employeeDTO) {
         try {
             logger.debug("Updating employee with id: {}", id);

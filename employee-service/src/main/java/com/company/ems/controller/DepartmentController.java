@@ -9,6 +9,8 @@ import com.company.ems.service.IDepartmentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +39,16 @@ public class DepartmentController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<DepartmentResponseDTO>>> getAllDepartments() {
+    public ResponseEntity<ApiResponse<Page<DepartmentResponseDTO>>> getAllDepartments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<DepartmentResponseDTO> response = departmentService.getAllDepartments(PageRequest.of(page, size));
+        ApiResponse<Page<DepartmentResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Departments fetched successfully");
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<DepartmentResponseDTO>>> getAllDepartmentsList() {
         List<DepartmentResponseDTO> response = departmentService.getAllDepartments();
         ApiResponse<List<DepartmentResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Departments fetched successfully");
         return ResponseEntity.ok(apiResponse);

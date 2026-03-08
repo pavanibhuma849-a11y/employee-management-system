@@ -77,4 +77,11 @@ public class ProjectController {
         ApiResponse<List<EmployeeResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Employees fetched successfully for project");
         return ResponseEntity.ok(apiResponse);
     }
+
+    @GetMapping("/employee/{empId}")
+    public ResponseEntity<ApiResponse<List<ProjectResponseDTO>>> getProjectsByEmployee(@PathVariable Long empId) {
+        List<ProjectResponseDTO> response = projectService.getProjectsByEmployeeId(empId);
+        ApiResponse<List<ProjectResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Projects fetched successfully for employee");
+        return ResponseEntity.ok(apiResponse);
+    }
 }

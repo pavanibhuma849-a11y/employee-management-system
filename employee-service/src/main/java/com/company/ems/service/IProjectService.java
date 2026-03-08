@@ -15,4 +15,5 @@ public interface IProjectService {
     void assignEmployeeToProject(Long projectId, Long employeeId);
     void removeEmployeeFromProject(Long projectId, Long employeeId);
     List<EmployeeResponseDTO> getEmployeesByProjectId(Long projectId);
+    List<ProjectResponseDTO> getProjectsByEmployeeId(Long employeeId);
 }

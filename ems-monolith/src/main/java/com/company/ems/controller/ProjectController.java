@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,15 +61,31 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ProjectResponseDTO>>> getAllProjects() {
+    public ResponseEntity<ApiResponse<Page<ProjectResponseDTO>>> getAllProjects(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         try {
-            logger.info("Fetching all projects");
+            logger.info("Fetching paginated projects - page: {}, size: {}", page, size);
+            Page<ProjectResponseDTO> response = projectService.getAllProjects(PageRequest.of(page, size));
+            logger.info("Projects fetched successfully - total elements: {}", response.getTotalElements());
+            ApiResponse<Page<ProjectResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Projects fetched successfully");
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception ex) {
+            logger.error("Error fetching all projects: {}", ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<ProjectResponseDTO>>> getAllProjectsList() {
+        try {
+            logger.info("Fetching all projects as list");
             List<ProjectResponseDTO> response = projectService.getAllProjects();
             logger.info("Projects fetched successfully - total: {}", response.size());
             ApiResponse<List<ProjectResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Projects fetched successfully");
             return ResponseEntity.ok(apiResponse);
         } catch (Exception ex) {
-            logger.error("Error fetching all projects: {}", ex.getMessage(), ex);
+            logger.error("Error fetching all projects list: {}", ex.getMessage(), ex);
             throw ex;
         }
     }
@@ -138,6 +156,20 @@ public class ProjectController {
             return ResponseEntity.ok(apiResponse);
         } catch (Exception ex) {
             logger.error("Error fetching employees for project with id {}: {}", id, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @GetMapping("/employee/{empId}")
+    public ResponseEntity<ApiResponse<List<ProjectResponseDTO>>> getProjectsByEmployee(@PathVariable Long empId) {
+        try {
+            logger.info("Fetching projects for employee with id: {}", empId);
+            List<ProjectResponseDTO> response = projectService.getProjectsByEmployeeId(empId);
+            logger.info("Projects fetched successfully for employee with id: {} - total: {}", empId, response.size());
+            ApiResponse<List<ProjectResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Projects fetched successfully for employee");
+            return ResponseEntity.ok(apiResponse);
+        } catch (Exception ex) {
+            logger.error("Error fetching projects for employee with id {}: {}", empId, ex.getMessage(), ex);
             throw ex;
         }
     }
