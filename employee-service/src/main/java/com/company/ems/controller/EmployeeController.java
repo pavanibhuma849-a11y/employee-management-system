@@ -63,8 +63,10 @@ public class EmployeeController {
     }
 
     @GetMapping("/sorted")
-    public ResponseEntity<List<EmployeeResponseDTO>> getSortedEmployees() {
-        return ResponseEntity.ok(employeeService.getAllEmployeesSortedByNameAndDate());
+    public ResponseEntity<ApiResponse<List<EmployeeResponseDTO>>> getSortedEmployees() {
+        List<EmployeeResponseDTO> response = employeeService.getAllEmployeesSortedByNameAndDate();
+        ApiResponse<List<EmployeeResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Sorted employees fetched successfully");
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PutMapping("/{id}")

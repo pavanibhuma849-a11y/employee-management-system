@@ -92,12 +92,13 @@ public class EmployeeController {
     }
 
     @GetMapping("/sorted")
-    public ResponseEntity<List<EmployeeResponseDTO>> getSortedEmployees() {
+    public ResponseEntity<ApiResponse<List<EmployeeResponseDTO>>> getSortedEmployees() {
         try {
             logger.info("Fetching all employees sorted by name and date");
             List<EmployeeResponseDTO> response = employeeService.getAllEmployeesSortedByNameAndDate();
             logger.info("Sorted employees fetched successfully - total: {}", response.size());
-            return ResponseEntity.ok(response);
+            ApiResponse<List<EmployeeResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Sorted employees fetched successfully");
+            return ResponseEntity.ok(apiResponse);
         } catch (Exception ex) {
             logger.error("Error fetching sorted employees: {}", ex.getMessage(), ex);
             throw ex;
@@ -105,12 +106,13 @@ public class EmployeeController {
     }
 
     @GetMapping("/sorted-by-salary")
-    public ResponseEntity<List<EmployeeResponseDTO>> getEmployeesSortedBySalary() {
+    public ResponseEntity<ApiResponse<List<EmployeeResponseDTO>>> getEmployeesSortedBySalary() {
         try {
             logger.info("Fetching all employees sorted by salary");
             List<EmployeeResponseDTO> response = employeeService.getAllEmployeesSortedBySalary();
             logger.info("Employees sorted by salary fetched successfully - total: {}", response.size());
-            return ResponseEntity.ok(response);
+            ApiResponse<List<EmployeeResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Employees sorted by salary fetched successfully");
+            return ResponseEntity.ok(apiResponse);
         } catch (Exception ex) {
             logger.error("Error fetching employees sorted by salary: {}", ex.getMessage(), ex);
             throw ex;

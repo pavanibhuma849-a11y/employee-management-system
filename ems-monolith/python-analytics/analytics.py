@@ -47,9 +47,10 @@ def fetch_from_csv():
         return None
 
 def process_data(df):
-    """Common processing for both DB and CSV data."""
-    if df.empty:
-        return df
+    """Common processing for both DB and CSV data (TC-044)."""
+    if df is None or df.empty:
+        print("Warning: Received empty dataset for processing.")
+        return pd.DataFrame()
         
     # Standardize department names to avoid duplicates like "HR" vs "Human Resources"
     dept_mapping = {
@@ -86,20 +87,90 @@ def process_data(df):
             
     return df
 
+def calculate_avg_salary(df):
+    """Calculate average salary per department (TC-039)."""
+    if 'department' in df.columns and 'salary' in df.columns:
+        avg_salary = df.groupby('department')['salary'].mean().to_dict()
+        print(f"Average Salary per Department: {avg_salary}")
+        return avg_salary
+    return {}
+
+def get_top_performers(df, threshold=90):
+    """Identify top performers based on threshold (TC-040)."""
+    if 'performance_score' in df.columns:
+        top_performers = df[df['performance_score'] >= threshold].sort_values(by='performance_score', ascending=False)
+        return top_performers[['name', 'performance_score']].to_dict(orient='records')
+    return []
+
+def attrition_risk(df):
+    """Flag employees at risk of attrition based on low performance and experience (TC-041)."""
+    if df.empty:
+        return []
+    if 'performance_score' in df.columns and 'years_experience' in df.columns:
+        # Rule: High risk if performance < 75 or (performance < 85 and experience > 10)
+        risk_mask = (df['performance_score'] < 75) | ((df['performance_score'] < 85) & (df['years_experience'] > 10))
+        at_risk = df[risk_mask]
+        return at_risk[['name', 'role', 'performance_score', 'years_experience']].to_dict(orient='records')
+    return []
+
+def verify_aggregation_accuracy(df):
+    """Verify that groupby aggregations are accurate (TC-045)."""
+    if df.empty or 'department' not in df.columns or 'salary' not in df.columns:
+        return False
+        
+    # Example manual check for one department
+    depts = df['department'].unique()
+    if len(depts) > 0:
+        test_dept = depts[0]
+        dept_salaries = df[df['department'] == test_dept]['salary']
+        expected_mean = dept_salaries.mean()
+        actual_mean = df.groupby('department')['salary'].mean().loc[test_dept]
+        
+        is_accurate = np.isclose(expected_mean, actual_mean)
+        print(f"Aggregation Accuracy Check ({test_dept}): {'PASSED' if is_accurate else 'FAILED'}")
+        return is_accurate
+    return True
+
+def export_report(data, format='json'):
+    """Export the analytics report to CSV or JSON (TC-042, TC-043)."""
+    if not os.path.exists('reports'):
+        os.makedirs('reports')
+        
+    if format == 'json':
+        file_path = 'reports/analytics_report_export.json'
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=4)
+        print(f"Report exported to {file_path}")
+    elif format == 'csv':
+        file_path = 'reports/analytics_report_export.csv'
+        # Convert the dictionary data to a flat DataFrame for CSV export
+        # We'll focus on the core metrics for CSV summary
+        export_df = pd.DataFrame(data.get('top_performers', []))
+        export_df.to_csv(file_path, index=False)
+        print(f"Report exported to {file_path}")
+    return True
+
 def run_analytics(df):
+    """Run the complete analytics suite (TC-039 to TC-045)."""
+    if df.empty:
+        print("No data available to run analytics (TC-044).")
+        return
+        
     print("\n--- Employee Analytics Summary ---")
     
-    # 1. Average salary per department
-    avg_salary = df.groupby('department')['salary'].mean().to_dict()
-    print(f"Average Salary per Department: {avg_salary}")
+    # 0. Verify aggregation accuracy (TC-045)
+    verify_aggregation_accuracy(df)
     
-    # 2. Identify top performers (score > 90)
-    top_performers = df[df['performance_score'] > 90][['name', 'performance_score']].to_dict(orient='records')
+    # 1. Average salary per department
+    avg_salary = calculate_avg_salary(df)
+    
+    # 2. Identify top performers (TC-040)
+    top_performers = get_top_performers(df, threshold=90)
     print(f"Top Performers: {top_performers}")
     
-    # 3. Attrition Risk (Rule-based: low performance)
-    attrition_risk = df[df['performance_score'] < 80][['name', 'role']].to_dict(orient='records')
-    print(f"Attrition Risk (Low Performance): {attrition_risk}")
+    # 3. Attrition Risk (TC-041)
+    attrition_data = attrition_risk(df)
+    print(f"Attrition Risk (High Risk): {attrition_data}")
     
     # --- Module 6: AI/ML Concept Application ---
     print("\n--- Module 6: AI/ML Concept Application ---")
@@ -164,7 +235,7 @@ def run_analytics(df):
     report_data = {
         'average_salary': avg_salary,
         'top_performers': top_performers,
-        'attrition_risk': attrition_risk,
+        'attrition_risk': attrition_data,
         'salary_regression': {
             'coefficient': coef,
             'intercept': intercept,
@@ -179,6 +250,10 @@ def run_analytics(df):
     with open('reports/analytics_report.json', 'w') as f:
         json.dump(report_data, f, indent=4)
         
+    # Export reports in CSV and JSON formats (TC-042, TC-043)
+    export_report(report_data, format='csv')
+    export_report(report_data, format='json')
+    
     df.groupby('department')['salary'].mean().to_csv('reports/department_salary_report.csv')
     df.to_csv('reports/full_analytics_data.csv', index=False)
     
@@ -187,13 +262,16 @@ def run_analytics(df):
 def main():
     print("Smart Employee Management Analytics Engine")
     
-    # Force database connection (removed fallback to CSV as per request)
-    df = fetch_from_db()
+    # Try to load from CSV (TC-038) if it exists, otherwise fallback to DB
+    if os.path.exists(CSV_FILE):
+        df = fetch_from_csv()
+    else:
+        df = fetch_from_db()
     
     if df is not None and not df.empty:
         run_analytics(df)
     else:
-        print("Error: No data available from the database. Please ensure the database is running and populated.")
+        print("Error: No data available. Please ensure the database or employees.csv is available.")
 
 if __name__ == "__main__":
     main()

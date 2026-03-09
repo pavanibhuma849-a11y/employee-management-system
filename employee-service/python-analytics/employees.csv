@@ -1,0 +1,11 @@
+id,name,role,salary,years_experience,department,joiningDate,performance_score
+1,Employee 1,Developer,60000,2,IT,2022-01-15,85
+2,Employee 2,Manager,85000,8,HR,2018-03-10,92
+3,Employee 3,Developer,62000,3,IT,2021-05-20,78
+4,Employee 4,Designer,55000,4,Design,2020-11-05,88
+5,Employee 5,Developer,61000,3,IT,2021-06-15,95
+6,Employee 6,HR,50000,5,HR,2019-02-10,82
+7,Employee 7,IT Support,48000,2,IT,2022-08-15,75
+8,Employee 8,Manager,90000,10,Management,2015-01-01,96
+9,Employee 9,Developer,63000,4,IT,2021-09-20,80
+10,Employee 10,Designer,57000,5,Design,2020-03-15,89

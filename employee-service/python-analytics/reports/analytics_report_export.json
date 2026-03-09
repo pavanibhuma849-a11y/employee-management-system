@@ -1,0 +1,69 @@
+{
+    "average_salary": {
+        "Design": 56000.0,
+        "HR": 67500.0,
+        "IT": 58800.0,
+        "Management": 90000.0
+    },
+    "top_performers": [
+        {
+            "name": "Employee 8",
+            "performance_score": 96
+        },
+        {
+            "name": "Employee 5",
+            "performance_score": 95
+        },
+        {
+            "name": "Employee 2",
+            "performance_score": 92
+        }
+    ],
+    "attrition_risk": [],
+    "salary_regression": {
+        "coefficient": 4460.264900662252,
+        "intercept": 42582.78145695364
+    },
+    "segments": [
+        {
+            "name": "Employee 1",
+            "segment": 0
+        },
+        {
+            "name": "Employee 2",
+            "segment": 1
+        },
+        {
+            "name": "Employee 3",
+            "segment": 2
+        },
+        {
+            "name": "Employee 4",
+            "segment": 0
+        },
+        {
+            "name": "Employee 5",
+            "segment": 0
+        },
+        {
+            "name": "Employee 6",
+            "segment": 2
+        },
+        {
+            "name": "Employee 7",
+            "segment": 2
+        },
+        {
+            "name": "Employee 8",
+            "segment": 1
+        },
+        {
+            "name": "Employee 9",
+            "segment": 2
+        },
+        {
+            "name": "Employee 10",
+            "segment": 0
+        }
+    ]
+}
