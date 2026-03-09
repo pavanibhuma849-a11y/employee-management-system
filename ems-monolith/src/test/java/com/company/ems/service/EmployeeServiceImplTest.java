@@ -6,6 +6,7 @@ import com.company.ems.dto.EmployeeUpdateRequestDTO;
 import com.company.ems.exception.EmployeeNotFoundException;
 import com.company.ems.model.Department;
 import com.company.ems.model.Employee;
+import com.company.ems.model.Project;
 import com.company.ems.repository.DepartmentRepository;
 import com.company.ems.repository.EmployeeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -695,5 +696,72 @@ public class EmployeeServiceImplTest {
         assertEquals("Emp 101", result.get(101L).getName());
         assertEquals("Emp 102", result.get(102L).getName());
         assertNull(result.get(103L));
+    }
+
+    @Test
+    public void testUpdateEmployee_GenericException() {
+        EmployeeUpdateRequestDTO updateDTO = new EmployeeUpdateRequestDTO();
+        when(employeeRepository.findById(anyLong())).thenThrow(new RuntimeException("Update failed"));
+
+        assertThrows(RuntimeException.class, () -> employeeService.updateEmployee(1L, updateDTO));
+        verify(employeeRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    public void testGetAllEmployeesSortedBySalary_Success() {
+        Employee emp1 = new Employee();
+        emp1.setId(1L);
+        emp1.setSalary(50000.0);
+        Employee emp2 = new Employee();
+        emp2.setId(2L);
+        emp2.setSalary(40000.0);
+        
+        when(employeeRepository.findAll()).thenReturn(Arrays.asList(emp1, emp2));
+        
+        List<EmployeeResponseDTO> result = employeeService.getAllEmployeesSortedBySalary();
+        
+        assertNotNull(result);
+        assertEquals(40000.0, result.get(0).getSalary());
+        assertEquals(50000.0, result.get(1).getSalary());
+    }
+
+    @Test
+    public void testGetAllEmployeesSortedBySalary_Exception() {
+        when(employeeRepository.findAll()).thenThrow(new RuntimeException("Salary sort failed"));
+        assertThrows(RuntimeException.class, () -> employeeService.getAllEmployeesSortedBySalary());
+    }
+
+    @Test
+    public void testMapToResponseDTO_Exception() {
+        Employee emp = new Employee();
+        emp.setId(1L);
+        Project p = mock(Project.class);
+        when(p.getName()).thenThrow(new RuntimeException("Mapping error"));
+        emp.setProjects(new java.util.HashSet<>(Arrays.asList(p)));
+
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(emp));
+
+        assertThrows(RuntimeException.class, () -> employeeService.getEmployeeById(1L));
+    }
+
+    @Test
+    public void testGetEmployeesByDepartmentId_Exception() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(employeeRepository.findByDepartmentId(anyLong(), any(Pageable.class)))
+                .thenThrow(new RuntimeException("Search failed"));
+        
+        assertThrows(RuntimeException.class, () -> employeeService.getEmployeesByDepartmentId(1L, pageable));
+    }
+
+    @Test
+    public void testGetEmployeesInTreeSet_Exception() {
+        when(employeeRepository.findAll()).thenThrow(new RuntimeException("Fetch failed"));
+        assertThrows(RuntimeException.class, () -> employeeService.getEmployeesInTreeSet());
+    }
+
+    @Test
+    public void testGetEmployeeMapById_Exception() {
+        when(employeeRepository.findAll()).thenThrow(new RuntimeException("Fetch failed"));
+        assertThrows(RuntimeException.class, () -> employeeService.getEmployeeMapById());
     }
 }

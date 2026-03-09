@@ -3,8 +3,10 @@ package com.company.ems.exception;
 import com.company.ems.dto.ApiResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,9 +14,11 @@ import org.springframework.core.MethodParameter;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class GlobalExceptionHandlerTest {
 
@@ -136,7 +140,7 @@ public class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
 
         ApiResponse<Object> body = response.getBody();
-        assertEquals(message, body.getMessage());
+        assertEquals("An internal server error occurred.", body.getMessage());
     }
 
     @Test
@@ -152,7 +156,7 @@ public class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
 
         ApiResponse<Object> body = response.getBody();
-        assertEquals(message, body.getMessage());
+        assertEquals("An internal server error occurred.", body.getMessage());
     }
 
     @Test
@@ -212,5 +216,87 @@ public class GlobalExceptionHandlerTest {
         ResponseEntity<?> response = globalExceptionHandler.handleGlobalException(exception, webRequest);
 
         assertEquals(500, response.getStatusCode().value());
+    }
+
+    @Test
+    public void testHandleHttpMessageNotReadableException() {
+        HttpMessageNotReadableException exception = new HttpMessageNotReadableException("JSON error");
+        ResponseEntity<ApiResponse<Object>> response = globalExceptionHandler.handleHttpMessageNotReadableException(exception);
+        
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Invalid data type in request body", response.getBody().getMessage());
+    }
+
+    @Test
+    public void testHandleConflictException() {
+        DuplicateResourceException exception = new DuplicateResourceException("Duplicate");
+        ResponseEntity<ApiResponse<Object>> response = globalExceptionHandler.handleConflictException(exception, webRequest);
+        
+        assertNotNull(response);
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Duplicate", response.getBody().getMessage());
+    }
+
+    @Test
+    public void testHandleDatabaseException() {
+        DataAccessException exception = new DataAccessException("DB error") {};
+        ResponseEntity<ApiResponse<Object>> response = globalExceptionHandler.handleDatabaseException(exception, webRequest);
+        
+        assertNotNull(response);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("A database error occurred. Please try again later.", response.getBody().getMessage());
+    }
+
+    @Test
+    public void testHandleValidationException_MergeFunction() throws NoSuchMethodException {
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "testObject");
+        // Two errors for the same field to trigger merge function at line 69
+        bindingResult.addError(new FieldError("testObject", "field1", "error 1"));
+        bindingResult.addError(new FieldError("testObject", "field1", "error 2"));
+
+        MethodParameter methodParameter = new MethodParameter(this.getClass().getDeclaredMethod("dummyMethod", String.class), 0);
+        MethodArgumentNotValidException exception = new MethodArgumentNotValidException(methodParameter, bindingResult);
+
+        ResponseEntity<ApiResponse<Map<String, String>>> response = globalExceptionHandler.handleValidationException(exception);
+        
+        assertNotNull(response);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("error 1", response.getBody().getData().get("field1"));
+    }
+
+    @Test
+    public void testHandleNotFoundException_CatchBlock() {
+        assertThrows(NullPointerException.class, () -> globalExceptionHandler.handleNotFoundException(null, webRequest));
+    }
+
+    @Test
+    public void testHandleBadRequestException_CatchBlock() {
+        assertThrows(NullPointerException.class, () -> globalExceptionHandler.handleBadRequestException(null, webRequest));
+    }
+
+    @Test
+    public void testHandleHttpMessageNotReadableException_CatchBlock() {
+        assertThrows(NullPointerException.class, () -> globalExceptionHandler.handleHttpMessageNotReadableException(null));
+    }
+
+    @Test
+    public void testHandleValidationException_CatchBlock() {
+        assertThrows(NullPointerException.class, () -> globalExceptionHandler.handleValidationException(null));
+    }
+
+    @Test
+    public void testHandleConflictException_CatchBlock() {
+        assertThrows(NullPointerException.class, () -> globalExceptionHandler.handleConflictException(null, webRequest));
+    }
+
+    @Test
+    public void testHandleDatabaseException_CatchBlock() {
+        assertThrows(NullPointerException.class, () -> globalExceptionHandler.handleDatabaseException(null, webRequest));
+    }
+
+    @Test
+    public void testHandleGlobalException_CatchBlock() {
+        assertThrows(NullPointerException.class, () -> globalExceptionHandler.handleGlobalException(null, webRequest));
     }
 }

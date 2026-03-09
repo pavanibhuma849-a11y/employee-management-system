@@ -12,6 +12,8 @@ import com.company.ems.model.Project;
 import com.company.ems.repository.DepartmentRepository;
 import com.company.ems.repository.EmployeeRepository;
 import com.company.ems.repository.ProjectRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 @Service
 public class EmployeeServiceImpl implements IEmployeeService {
     
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
+    
     @Autowired
     private EmployeeRepository employeeRepository;
 
@@ -38,68 +42,127 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Override
     public EmployeeResponseDTO createEmployee(EmployeeRequestDTO employeeDTO) {
-        Employee employee = mapToEntity(employeeDTO);
-        Employee savedEmployee = employeeRepository.save(employee);
-        return mapToResponseDTO(savedEmployee);
+        try {
+            logger.debug("Creating employee with name: {}", employeeDTO.getName());
+            Employee employee = mapToEntity(employeeDTO);
+            Employee savedEmployee = employeeRepository.save(employee);
+            logger.info("Employee created successfully with id: {}", savedEmployee.getId());
+            return mapToResponseDTO(savedEmployee);
+        } catch (Exception ex) {
+            logger.error("Error creating employee: {}", ex.getMessage(), ex);
+            throw ex;
+        }
     }
 
     @Override
     public EmployeeResponseDTO getEmployeeById(Long id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
-        return mapToResponseDTO(employee);
+        try {
+            logger.debug("Fetching employee with id: {}", id);
+            Employee employee = employeeRepository.findById(id)
+                    .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
+            logger.info("Employee fetched successfully with id: {}", id);
+            return mapToResponseDTO(employee);
+        } catch (EmployeeNotFoundException ex) {
+            logger.warn("Employee not found with id: {}", id);
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error fetching employee with id {}: {}", id, ex.getMessage(), ex);
+            throw ex;
+        }
     }
 
     @Override
     public Page<EmployeeResponseDTO> getEmployees(String departmentName, Pageable pageable) {
-        Page<Employee> employees;
-        if (departmentName != null && !departmentName.isEmpty()) {
-            employees = employeeRepository.findByDepartmentName(departmentName, pageable);
-        } else {
-            employees = employeeRepository.findAll(pageable);
+        try {
+            logger.debug("Fetching employees - department: {}, page: {}, size: {}", departmentName, pageable.getPageNumber(), pageable.getPageSize());
+            Page<Employee> employees;
+            if (departmentName != null && !departmentName.isEmpty()) {
+                employees = employeeRepository.findByDepartmentName(departmentName, pageable);
+                logger.info("Employees fetched by department: {} - total: {}", departmentName, employees.getTotalElements());
+            } else {
+                employees = employeeRepository.findAll(pageable);
+                logger.info("All employees fetched - total: {}", employees.getTotalElements());
+            }
+            return employees.map(this::mapToResponseDTO);
+        } catch (Exception ex) {
+            logger.error("Error fetching employees: {}", ex.getMessage(), ex);
+            throw ex;
         }
-        return employees.map(this::mapToResponseDTO);
     }
 
     @Override
     public Page<EmployeeResponseDTO> getEmployeesByDepartmentId(Long departmentId, Pageable pageable) {
-        Page<Employee> employees = employeeRepository.findByDepartmentId(departmentId, pageable);
-        return employees.map(this::mapToResponseDTO);
+        try {
+            logger.debug("Fetching employees by departmentId: {}, page: {}, size: {}", departmentId, pageable.getPageNumber(), pageable.getPageSize());
+            Page<Employee> employees = employeeRepository.findByDepartmentId(departmentId, pageable);
+            logger.info("Employees fetched by departmentId: {} - total: {}", departmentId, employees.getTotalElements());
+            return employees.map(this::mapToResponseDTO);
+        } catch (Exception ex) {
+            logger.error("Error fetching employees by departmentId {}: {}", departmentId, ex.getMessage(), ex);
+            throw ex;
+        }
     }
 
     @Override
     public EmployeeResponseDTO updateEmployee(Long id, EmployeeUpdateRequestDTO employeeDTO) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
-        
-        employee.setName(employeeDTO.getName());
-        employee.setRole(employeeDTO.getRole());
-        employee.setSalary(employeeDTO.getSalary());
-        employee.setJoiningDate(employeeDTO.getJoiningDate());
-        
-        if (employeeDTO.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(employeeDTO.getDepartmentId())
-                    .orElseThrow(() -> new DepartmentNotFoundException("Department not found with id: " + employeeDTO.getDepartmentId()));
-            employee.setDepartment(department);
-        }
+        try {
+            logger.debug("Updating employee with id: {}", id);
+            Employee employee = employeeRepository.findById(id)
+                    .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
+            
+            employee.setName(employeeDTO.getName());
+            employee.setRole(employeeDTO.getRole());
+            employee.setSalary(employeeDTO.getSalary());
+            employee.setJoiningDate(employeeDTO.getJoiningDate());
+            
+            if (employeeDTO.getDepartmentId() != null) {
+                try {
+                    Department department = departmentRepository.findById(employeeDTO.getDepartmentId())
+                            .orElseThrow(() -> new DepartmentNotFoundException("Department not found with id: " + employeeDTO.getDepartmentId()));
+                    employee.setDepartment(department);
+                    logger.debug("Department assigned to employee");
+                } catch (Exception ex) {
+                    logger.error("Error assigning department to employee: {}", ex.getMessage(), ex);
+                    throw ex;
+                }
+            }
 
-        if (employeeDTO.getProjectIds() != null) {
-            java.util.Set<Project> projects = employeeDTO.getProjectIds().stream()
-                    .map(projectId -> projectRepository.findById(projectId)
-                            .orElseThrow(() -> new ProjectNotFoundException("Project not found with id: " + projectId)))
-                    .collect(Collectors.toSet());
-            employee.setProjects(projects);
-        }
+            if (employeeDTO.getProjectIds() != null) {
+                java.util.Set<Project> projects = employeeDTO.getProjectIds().stream()
+                        .map(projectId -> projectRepository.findById(projectId)
+                                .orElseThrow(() -> new ProjectNotFoundException("Project not found with id: " + projectId)))
+                        .collect(Collectors.toSet());
+                employee.setProjects(projects);
+                logger.debug("Projects assigned to employee");
+            }
 
-        Employee updatedEmployee = employeeRepository.save(employee);
-        return mapToResponseDTO(updatedEmployee);
+            Employee updatedEmployee = employeeRepository.save(employee);
+            logger.info("Employee updated successfully with id: {}", id);
+            return mapToResponseDTO(updatedEmployee);
+        } catch (EmployeeNotFoundException ex) {
+            logger.warn("Employee not found with id: {}", id);
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error updating employee with id {}: {}", id, ex.getMessage(), ex);
+            throw ex;
+        }
     }
 
     @Override
     public void deleteEmployee(Long id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
-        employeeRepository.delete(employee);
+        try {
+            logger.debug("Deleting employee with id: {}", id);
+            Employee employee = employeeRepository.findById(id)
+                    .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
+            employeeRepository.delete(employee);
+            logger.info("Employee deleted successfully with id: {}", id);
+        } catch (EmployeeNotFoundException ex) {
+            logger.warn("Employee not found with id: {}", id);
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error deleting employee with id {}: {}", id, ex.getMessage(), ex);
+            throw ex;
+        }
     }
 
     @Override

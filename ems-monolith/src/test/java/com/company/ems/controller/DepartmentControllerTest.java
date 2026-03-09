@@ -3,6 +3,7 @@ package com.company.ems.controller;
 import com.company.ems.dto.DepartmentRequestDTO;
 import com.company.ems.dto.DepartmentResponseDTO;
 import com.company.ems.dto.DepartmentUpdateRequestDTO;
+import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.exception.DepartmentNotFoundException;
 import com.company.ems.service.IDepartmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -134,51 +139,54 @@ public class DepartmentControllerTest {
         dept3.setName("Finance");
 
         List<DepartmentResponseDTO> departments = Arrays.asList(dept1, dept2, dept3);
+        Page<DepartmentResponseDTO> page = new PageImpl<>(departments, PageRequest.of(0, 10), 3);
 
-        when(departmentService.getAllDepartments())
-                .thenReturn(departments);
+        when(departmentService.getAllDepartments(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/departments")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(3)))
-                .andExpect(jsonPath("$.data[0].id", is(1)))
-                .andExpect(jsonPath("$.data[0].name", is("IT")))
-                .andExpect(jsonPath("$.data[1].id", is(2)))
-                .andExpect(jsonPath("$.data[1].name", is("HR")))
-                .andExpect(jsonPath("$.data[2].id", is(3)))
-                .andExpect(jsonPath("$.data[2].name", is("Finance")));
+                .andExpect(jsonPath("$.data.content", hasSize(3)))
+                .andExpect(jsonPath("$.data.content[0].id", is(1)))
+                .andExpect(jsonPath("$.data.content[0].name", is("IT")))
+                .andExpect(jsonPath("$.data.content[1].id", is(2)))
+                .andExpect(jsonPath("$.data.content[1].name", is("HR")))
+                .andExpect(jsonPath("$.data.content[2].id", is(3)))
+                .andExpect(jsonPath("$.data.content[2].name", is("Finance")));
 
-        verify(departmentService, times(1)).getAllDepartments();
+        verify(departmentService, times(1)).getAllDepartments(any(Pageable.class));
     }
 
     @Test
     public void testGetAllDepartments_Empty() throws Exception {
-        when(departmentService.getAllDepartments())
-                .thenReturn(Arrays.asList());
+        Page<DepartmentResponseDTO> emptyPage = new PageImpl<>(Arrays.asList(), PageRequest.of(0, 10), 0);
+        when(departmentService.getAllDepartments(any(Pageable.class)))
+                .thenReturn(emptyPage);
 
         mockMvc.perform(get("/departments")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(0)));
+                .andExpect(jsonPath("$.data.content", hasSize(0)));
 
-        verify(departmentService, times(1)).getAllDepartments();
+        verify(departmentService, times(1)).getAllDepartments(any(Pageable.class));
     }
 
     @Test
     public void testGetAllDepartments_SingleDepartment() throws Exception {
         List<DepartmentResponseDTO> departments = Arrays.asList(departmentResponseDTO);
+        Page<DepartmentResponseDTO> page = new PageImpl<>(departments, PageRequest.of(0, 10), 1);
 
-        when(departmentService.getAllDepartments())
-                .thenReturn(departments);
+        when(departmentService.getAllDepartments(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/departments")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(1)))
-                .andExpect(jsonPath("$.data[0].name", is("IT")));
+                .andExpect(jsonPath("$.data.content", hasSize(1)))
+                .andExpect(jsonPath("$.data.content[0].name", is("IT")));
 
-        verify(departmentService, times(1)).getAllDepartments();
+        verify(departmentService, times(1)).getAllDepartments(any(Pageable.class));
     }
 
     @Test
@@ -304,20 +312,21 @@ public class DepartmentControllerTest {
         dept4.setName("Operations");
 
         List<DepartmentResponseDTO> departments = Arrays.asList(dept1, dept2, dept3, dept4);
+        Page<DepartmentResponseDTO> page = new PageImpl<>(departments, PageRequest.of(0, 10), 4);
 
-        when(departmentService.getAllDepartments())
-                .thenReturn(departments);
+        when(departmentService.getAllDepartments(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/departments")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(4)))
-                .andExpect(jsonPath("$.data[0].name", is("IT")))
-                .andExpect(jsonPath("$.data[1].name", is("HR")))
-                .andExpect(jsonPath("$.data[2].name", is("Finance")))
-                .andExpect(jsonPath("$.data[3].name", is("Operations")));
+                .andExpect(jsonPath("$.data.content", hasSize(4)))
+                .andExpect(jsonPath("$.data.content[0].name", is("IT")))
+                .andExpect(jsonPath("$.data.content[1].name", is("HR")))
+                .andExpect(jsonPath("$.data.content[2].name", is("Finance")))
+                .andExpect(jsonPath("$.data.content[3].name", is("Operations")));
 
-        verify(departmentService, times(1)).getAllDepartments();
+        verify(departmentService, times(1)).getAllDepartments(any(Pageable.class));
     }
 
     @Test
@@ -375,14 +384,14 @@ public class DepartmentControllerTest {
 
     @Test
     public void testGetAllDepartments_ServiceException() throws Exception {
-        when(departmentService.getAllDepartments())
+        when(departmentService.getAllDepartments(any(Pageable.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         mockMvc.perform(get("/departments")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
 
-        verify(departmentService, times(1)).getAllDepartments();
+        verify(departmentService, times(1)).getAllDepartments(any(Pageable.class));
     }
 
     @Test
@@ -423,5 +432,76 @@ public class DepartmentControllerTest {
                 .andExpect(status().isInternalServerError());
 
         verify(departmentService, times(1)).deleteDepartment(1L);
+    }
+
+    @Test
+    public void testGetAllDepartments_NullResponse() throws Exception {
+        when(departmentService.getAllDepartments(any(Pageable.class)))
+                .thenReturn(null);
+
+        mockMvc.perform(get("/departments")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        verify(departmentService, times(1)).getAllDepartments(any(Pageable.class));
+    }
+
+    @Test
+    public void testGetAllDepartmentsList_Success() throws Exception {
+        when(departmentService.getAllDepartments())
+                .thenReturn(Arrays.asList(departmentResponseDTO));
+
+        mockMvc.perform(get("/departments/all")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].id", is(1)))
+                .andExpect(jsonPath("$.data[0].name", is("IT")));
+
+        verify(departmentService, times(1)).getAllDepartments();
+    }
+
+    @Test
+    public void testGetAllDepartmentsList_Exception() throws Exception {
+        when(departmentService.getAllDepartments())
+                .thenThrow(new RuntimeException("Error fetching list"));
+
+        mockMvc.perform(get("/departments/all")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+
+        verify(departmentService, times(1)).getAllDepartments();
+    }
+
+    @Test
+    public void testGetEmployeesByDepartment_Success() throws Exception {
+        EmployeeResponseDTO emp = new EmployeeResponseDTO();
+        emp.setId(1L);
+        emp.setName("John Doe");
+
+        when(departmentService.getEmployeesByDepartment(1L))
+                .thenReturn(Arrays.asList(emp));
+
+        mockMvc.perform(get("/departments/1/employees")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].id", is(1)))
+                .andExpect(jsonPath("$.data[0].name", is("John Doe")));
+
+        verify(departmentService, times(1)).getEmployeesByDepartment(1L);
+    }
+
+    @Test
+    public void testGetEmployeesByDepartment_Exception() throws Exception {
+        when(departmentService.getEmployeesByDepartment(1L))
+                .thenThrow(new RuntimeException("Error fetching employees"));
+
+        mockMvc.perform(get("/departments/1/employees")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+
+        verify(departmentService, times(1)).getEmployeesByDepartment(1L);
     }
 }

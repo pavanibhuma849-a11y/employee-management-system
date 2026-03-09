@@ -1,5 +1,6 @@
 package com.company.ems.controller;
 
+import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.dto.ProjectRequestDTO;
 import com.company.ems.dto.ProjectResponseDTO;
 import com.company.ems.dto.ProjectUpdateRequestDTO;
@@ -11,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -169,54 +174,54 @@ public class ProjectControllerTest {
         proj3.setDuration(8);
 
         List<ProjectResponseDTO> projects = Arrays.asList(proj1, proj2, proj3);
+        Page<ProjectResponseDTO> page = new PageImpl<>(projects, PageRequest.of(0, 10), 3);
 
-        when(projectService.getAllProjects())
-                .thenReturn(projects);
+        when(projectService.getAllProjects(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/projects")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(3)))
-                .andExpect(jsonPath("$.data[0].id", is(1)))
-                .andExpect(jsonPath("$.data[0].name", is("Mobile App Development")))
-                .andExpect(jsonPath("$.data[0].duration", is(6)))
-                .andExpect(jsonPath("$.data[1].id", is(2)))
-                .andExpect(jsonPath("$.data[1].name", is("Web Application")))
-                .andExpect(jsonPath("$.data[1].duration", is(12)))
-                .andExpect(jsonPath("$.data[2].id", is(3)))
-                .andExpect(jsonPath("$.data[2].name", is("Data Analysis Tool")))
-                .andExpect(jsonPath("$.data[2].duration", is(8)));
+                .andExpect(jsonPath("$.data.content", hasSize(3)))
+                .andExpect(jsonPath("$.data.content[0].id", is(1)))
+                .andExpect(jsonPath("$.data.content[0].name", is("Mobile App Development")))
+                .andExpect(jsonPath("$.data.content[1].id", is(2)))
+                .andExpect(jsonPath("$.data.content[1].name", is("Web Application")))
+                .andExpect(jsonPath("$.data.content[2].id", is(3)))
+                .andExpect(jsonPath("$.data.content[2].name", is("Data Analysis Tool")));
 
-        verify(projectService, times(1)).getAllProjects();
+        verify(projectService, times(1)).getAllProjects(any(Pageable.class));
     }
 
     @Test
     public void testGetAllProjects_Empty() throws Exception {
-        when(projectService.getAllProjects())
-                .thenReturn(Arrays.asList());
+        Page<ProjectResponseDTO> emptyPage = new PageImpl<>(Arrays.asList(), PageRequest.of(0, 10), 0);
+        when(projectService.getAllProjects(any(Pageable.class)))
+                .thenReturn(emptyPage);
 
         mockMvc.perform(get("/projects")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(0)));
+                .andExpect(jsonPath("$.data.content", hasSize(0)));
 
-        verify(projectService, times(1)).getAllProjects();
+        verify(projectService, times(1)).getAllProjects(any(Pageable.class));
     }
 
     @Test
     public void testGetAllProjects_SingleProject() throws Exception {
         List<ProjectResponseDTO> projects = Arrays.asList(projectResponseDTO);
+        Page<ProjectResponseDTO> page = new PageImpl<>(projects, PageRequest.of(0, 10), 1);
 
-        when(projectService.getAllProjects())
-                .thenReturn(projects);
+        when(projectService.getAllProjects(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/projects")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(1)))
-                .andExpect(jsonPath("$.data[0].name", is("Mobile App Development")));
+                .andExpect(jsonPath("$.data.content", hasSize(1)))
+                .andExpect(jsonPath("$.data.content[0].name", is("Mobile App Development")));
 
-        verify(projectService, times(1)).getAllProjects();
+        verify(projectService, times(1)).getAllProjects(any(Pageable.class));
     }
 
     @Test
@@ -390,21 +395,22 @@ public class ProjectControllerTest {
         proj5.setDuration(10);
 
         List<ProjectResponseDTO> projects = Arrays.asList(proj1, proj2, proj3, proj4, proj5);
+        Page<ProjectResponseDTO> page = new PageImpl<>(projects, PageRequest.of(0, 10), 5);
 
-        when(projectService.getAllProjects())
-                .thenReturn(projects);
+        when(projectService.getAllProjects(any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/projects")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(5)))
-                .andExpect(jsonPath("$.data[0].name", is("Mobile App Development")))
-                .andExpect(jsonPath("$.data[1].name", is("Web Application")))
-                .andExpect(jsonPath("$.data[2].name", is("Data Analysis Tool")))
-                .andExpect(jsonPath("$.data[3].name", is("Cloud Migration")))
-                .andExpect(jsonPath("$.data[4].name", is("Security Enhancement")));
+                .andExpect(jsonPath("$.data.content", hasSize(5)))
+                .andExpect(jsonPath("$.data.content[0].name", is("Mobile App Development")))
+                .andExpect(jsonPath("$.data.content[1].name", is("Web Application")))
+                .andExpect(jsonPath("$.data.content[2].name", is("Data Analysis Tool")))
+                .andExpect(jsonPath("$.data.content[3].name", is("Cloud Migration")))
+                .andExpect(jsonPath("$.data.content[4].name", is("Security Enhancement")));
 
-        verify(projectService, times(1)).getAllProjects();
+        verify(projectService, times(1)).getAllProjects(any(Pageable.class));
     }
 
     @Test
@@ -504,14 +510,14 @@ public class ProjectControllerTest {
 
     @Test
     public void testGetAllProjects_ServiceException() throws Exception {
-        when(projectService.getAllProjects())
+        when(projectService.getAllProjects(any(Pageable.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
         mockMvc.perform(get("/projects")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
 
-        verify(projectService, times(1)).getAllProjects();
+        verify(projectService, times(1)).getAllProjects(any(Pageable.class));
     }
 
     @Test
@@ -573,5 +579,137 @@ public class ProjectControllerTest {
                 .andExpect(jsonPath("$.data.duration", is(14)));
 
         verify(projectService, times(1)).getProjectById(2L);
+    }
+
+    @Test
+    public void testGetAllProjects_NullResponse() throws Exception {
+        when(projectService.getAllProjects(any(Pageable.class))).thenReturn(null);
+
+        mockMvc.perform(get("/projects")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").doesNotExist());
+        
+        verify(projectService).getAllProjects(any(Pageable.class));
+    }
+
+    @Test
+    public void testGetAllProjectsList_Success() throws Exception {
+        when(projectService.getAllProjects()).thenReturn(Arrays.asList(projectResponseDTO));
+
+        mockMvc.perform(get("/projects/all")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(1)));
+        
+        verify(projectService).getAllProjects();
+    }
+
+    @Test
+    public void testGetAllProjectsList_Exception() throws Exception {
+        when(projectService.getAllProjects()).thenThrow(new RuntimeException("Fetch failed"));
+
+        mockMvc.perform(get("/projects/all")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+        
+        verify(projectService).getAllProjects();
+    }
+
+    @Test
+    public void testAssignEmployeeToProject_Success() throws Exception {
+        doNothing().when(projectService).assignEmployeeToProject(1L, 1L);
+
+        mockMvc.perform(post("/projects/1/employees/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message", is("Employee assigned to project successfully")));
+        
+        verify(projectService).assignEmployeeToProject(1L, 1L);
+    }
+
+    @Test
+    public void testAssignEmployeeToProject_Exception() throws Exception {
+        doThrow(new RuntimeException("Assign failed")).when(projectService).assignEmployeeToProject(1L, 1L);
+
+        mockMvc.perform(post("/projects/1/employees/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+        
+        verify(projectService).assignEmployeeToProject(1L, 1L);
+    }
+
+    @Test
+    public void testRemoveEmployeeFromProject_Success() throws Exception {
+        doNothing().when(projectService).removeEmployeeFromProject(1L, 1L);
+
+        mockMvc.perform(delete("/projects/1/employees/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andExpect(jsonPath("$.message", is("Employee removed from project successfully")));
+        
+        verify(projectService).removeEmployeeFromProject(1L, 1L);
+    }
+
+    @Test
+    public void testRemoveEmployeeFromProject_Exception() throws Exception {
+        doThrow(new RuntimeException("Remove failed")).when(projectService).removeEmployeeFromProject(1L, 1L);
+
+        mockMvc.perform(delete("/projects/1/employees/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+        
+        verify(projectService).removeEmployeeFromProject(1L, 1L);
+    }
+
+    @Test
+    public void testGetEmployeesByProject_Success() throws Exception {
+        EmployeeResponseDTO emp = new EmployeeResponseDTO();
+        emp.setId(1L);
+        emp.setName("John Doe");
+        
+        when(projectService.getEmployeesByProjectId(1L)).thenReturn(Arrays.asList(emp));
+
+        mockMvc.perform(get("/projects/1/employees")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(1)))
+                .andExpect(jsonPath("$.data[0].name", is("John Doe")));
+        
+        verify(projectService).getEmployeesByProjectId(1L);
+    }
+
+    @Test
+    public void testGetEmployeesByProject_Exception() throws Exception {
+        when(projectService.getEmployeesByProjectId(1L)).thenThrow(new RuntimeException("Fetch failed"));
+
+        mockMvc.perform(get("/projects/1/employees")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+        
+        verify(projectService).getEmployeesByProjectId(1L);
+    }
+
+    @Test
+    public void testGetProjectsByEmployee_Success() throws Exception {
+        when(projectService.getProjectsByEmployeeId(1L)).thenReturn(Arrays.asList(projectResponseDTO));
+
+        mockMvc.perform(get("/projects/employee/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(1)));
+        
+        verify(projectService).getProjectsByEmployeeId(1L);
+    }
+
+    @Test
+    public void testGetProjectsByEmployee_Exception() throws Exception {
+        when(projectService.getProjectsByEmployeeId(1L)).thenThrow(new RuntimeException("Fetch failed"));
+
+        mockMvc.perform(get("/projects/employee/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
+        
+        verify(projectService).getProjectsByEmployeeId(1L);
     }
 }

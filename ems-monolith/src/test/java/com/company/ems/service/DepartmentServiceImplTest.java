@@ -3,8 +3,13 @@ package com.company.ems.service;
 import com.company.ems.dto.DepartmentRequestDTO;
 import com.company.ems.dto.DepartmentResponseDTO;
 import com.company.ems.dto.DepartmentUpdateRequestDTO;
+import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.exception.DepartmentNotFoundException;
+import com.company.ems.exception.DuplicateResourceException;
+import com.company.ems.exception.ResourceConflictException;
 import com.company.ems.model.Department;
+import com.company.ems.model.Employee;
+import com.company.ems.model.Project;
 import com.company.ems.repository.DepartmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,10 +17,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -427,5 +438,102 @@ public class DepartmentServiceImplTest {
         when(departmentRepository.findById(1L)).thenThrow(new RuntimeException("Connection timeout"));
 
         assertThrows(RuntimeException.class, () -> departmentService.deleteDepartment(1L));
+    }
+
+    @Test
+    public void testCreateDepartment_DuplicateName() {
+        when(departmentRepository.existsByName("IT")).thenReturn(true);
+
+        assertThrows(DuplicateResourceException.class, () -> departmentService.createDepartment(departmentRequestDTO));
+        verify(departmentRepository, never()).save(any(Department.class));
+    }
+
+    @Test
+    public void testGetAllDepartments_Paginated_Success() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Department> page = new PageImpl<>(Arrays.asList(department));
+        when(departmentRepository.findAll(pageable)).thenReturn(page);
+
+        Page<DepartmentResponseDTO> result = departmentService.getAllDepartments(pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        verify(departmentRepository).findAll(pageable);
+    }
+
+    @Test
+    public void testGetAllDepartments_Paginated_Exception() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(departmentRepository.findAll(pageable)).thenThrow(new RuntimeException("DB error"));
+
+        assertThrows(RuntimeException.class, () -> departmentService.getAllDepartments(pageable));
+    }
+
+    @Test
+    public void testDeleteDepartment_WithEmployees() {
+        Employee employee = new Employee();
+        employee.setName("John Doe");
+        department.setEmployees(Arrays.asList(employee));
+
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
+
+        assertThrows(ResourceConflictException.class, () -> departmentService.deleteDepartment(1L));
+        verify(departmentRepository, never()).delete(any(Department.class));
+    }
+
+    @Test
+    public void testGetEmployeesByDepartment_Success() {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        employee.setName("John Doe");
+        employee.setRole("Developer");
+        employee.setSalary(50000.0);
+        employee.setDepartment(department);
+        
+        Project project = new Project();
+        project.setName("Project A");
+        employee.setProjects(new HashSet<>(Arrays.asList(project)));
+        
+        department.setEmployees(Arrays.asList(employee));
+
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(department));
+
+        List<EmployeeResponseDTO> result = departmentService.getEmployeesByDepartment(1L);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("John Doe", result.get(0).getName());
+        assertEquals("Project A", result.get(0).getProjectNames().iterator().next());
+        assertEquals("IT", result.get(0).getDepartmentName());
+    }
+
+    @Test
+    public void testGetEmployeesByDepartment_Exception() {
+        when(departmentRepository.findById(1L)).thenThrow(new RuntimeException("Unexpected error"));
+
+        assertThrows(RuntimeException.class, () -> departmentService.getEmployeesByDepartment(1L));
+    }
+
+    @Test
+    public void testMapToResponseDTO_Exception() {
+        Department mockDept = mock(Department.class);
+        when(mockDept.getId()).thenThrow(new RuntimeException("Mapping failed"));
+        
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(mockDept));
+
+        assertThrows(RuntimeException.class, () -> departmentService.getDepartmentById(1L));
+    }
+
+    @Test
+    public void testMapToEmployeeResponseDTO_Exception() {
+        Employee mockEmp = mock(Employee.class);
+        when(mockEmp.getId()).thenThrow(new RuntimeException("Mapping failed"));
+        
+        Department dept = new Department();
+        dept.setEmployees(Arrays.asList(mockEmp));
+        
+        when(departmentRepository.findById(1L)).thenReturn(Optional.of(dept));
+
+        assertThrows(RuntimeException.class, () -> departmentService.getEmployeesByDepartment(1L));
     }
 }

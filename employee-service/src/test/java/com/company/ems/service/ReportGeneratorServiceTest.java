@@ -3,7 +3,7 @@ package com.company.ems.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.Duration;
@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @TestPropertySource(properties = "ems.report.fixed-rate=1000")
 public class ReportGeneratorServiceTest {
 

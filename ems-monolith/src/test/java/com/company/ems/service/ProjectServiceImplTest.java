@@ -1,11 +1,17 @@
 package com.company.ems.service;
 
+import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.dto.ProjectRequestDTO;
 import com.company.ems.dto.ProjectResponseDTO;
 import com.company.ems.dto.ProjectUpdateRequestDTO;
+import com.company.ems.exception.DuplicateResourceException;
+import com.company.ems.exception.EmployeeNotFoundException;
 import com.company.ems.exception.InvalidProjectDurationException;
 import com.company.ems.exception.ProjectNotFoundException;
+import com.company.ems.exception.ResourceConflictException;
+import com.company.ems.model.Employee;
 import com.company.ems.model.Project;
+import com.company.ems.repository.EmployeeRepository;
 import com.company.ems.repository.ProjectRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,10 +19,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,6 +40,9 @@ public class ProjectServiceImplTest {
 
     @Mock
     private ProjectRepository projectRepository;
+
+    @Mock
+    private EmployeeRepository employeeRepository;
 
     @InjectMocks
     private ProjectServiceImpl projectService;
@@ -634,5 +649,232 @@ public class ProjectServiceImplTest {
         when(projectRepository.findById(1L)).thenThrow(new RuntimeException("Connection timeout"));
 
         assertThrows(RuntimeException.class, () -> projectService.deleteProject(1L));
+    }
+
+    @Test
+    public void testGetAllProjects_Paginated_Success() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Project> page = new PageImpl<>(Arrays.asList(project));
+        when(projectRepository.findAll(pageable)).thenReturn(page);
+
+        Page<ProjectResponseDTO> result = projectService.getAllProjects(pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        verify(projectRepository).findAll(pageable);
+    }
+
+    @Test
+    public void testGetAllProjects_Paginated_Exception() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(projectRepository.findAll(pageable)).thenThrow(new RuntimeException("Database error"));
+
+        assertThrows(RuntimeException.class, () -> projectService.getAllProjects(pageable));
+    }
+
+    @Test
+    public void testAssignEmployeeToProject_Success() {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        employee.setProjects(new HashSet<>());
+
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+
+        projectService.assignEmployeeToProject(1L, 1L);
+
+        assertTrue(employee.getProjects().contains(project));
+        verify(employeeRepository).save(employee);
+    }
+
+    @Test
+    public void testAssignEmployeeToProject_ProjectNotFound() {
+        when(projectRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ProjectNotFoundException.class, () -> projectService.assignEmployeeToProject(1L, 1L));
+    }
+
+    @Test
+    public void testAssignEmployeeToProject_EmployeeNotFound() {
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(EmployeeNotFoundException.class, () -> projectService.assignEmployeeToProject(1L, 1L));
+    }
+
+    @Test
+    public void testAssignEmployeeToProject_DuplicateResource() {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        Set<Project> projects = new HashSet<>();
+        projects.add(project);
+        employee.setProjects(projects);
+
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+
+        assertThrows(DuplicateResourceException.class, () -> projectService.assignEmployeeToProject(1L, 1L));
+    }
+
+    @Test
+    public void testAssignEmployeeToProject_GenericException() {
+        when(projectRepository.findById(1L)).thenThrow(new RuntimeException("Unexpected error"));
+
+        assertThrows(RuntimeException.class, () -> projectService.assignEmployeeToProject(1L, 1L));
+    }
+
+    @Test
+    public void testRemoveEmployeeFromProject_Success() {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        Set<Project> projects = new HashSet<>();
+        projects.add(project);
+        employee.setProjects(projects);
+
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+
+        projectService.removeEmployeeFromProject(1L, 1L);
+
+        assertFalse(employee.getProjects().contains(project));
+        verify(employeeRepository).save(employee);
+    }
+
+    @Test
+    public void testRemoveEmployeeFromProject_ProjectNotFound() {
+        when(projectRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ProjectNotFoundException.class, () -> projectService.removeEmployeeFromProject(1L, 1L));
+    }
+
+    @Test
+    public void testRemoveEmployeeFromProject_EmployeeNotFound() {
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(EmployeeNotFoundException.class, () -> projectService.removeEmployeeFromProject(1L, 1L));
+    }
+
+    @Test
+    public void testRemoveEmployeeFromProject_ResourceConflict() {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        employee.setProjects(new HashSet<>());
+
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+
+        assertThrows(ResourceConflictException.class, () -> projectService.removeEmployeeFromProject(1L, 1L));
+    }
+
+    @Test
+    public void testRemoveEmployeeFromProject_GenericException() {
+        when(projectRepository.findById(1L)).thenThrow(new RuntimeException("Unexpected error"));
+
+        assertThrows(RuntimeException.class, () -> projectService.removeEmployeeFromProject(1L, 1L));
+    }
+
+    @Test
+    public void testGetEmployeesByProjectId_Success() {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        employee.setName("John Doe");
+        employee.setProjects(new HashSet<>(Arrays.asList(project)));
+        
+        project.setEmployees(new HashSet<>(Arrays.asList(employee)));
+
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+
+        List<EmployeeResponseDTO> result = projectService.getEmployeesByProjectId(1L);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("John Doe", result.get(0).getName());
+    }
+
+    @Test
+    public void testGetEmployeesByProjectId_WithDepartment_Success() {
+        com.company.ems.model.Department dept = new com.company.ems.model.Department();
+        dept.setName("IT");
+
+        Employee employee = new Employee();
+        employee.setId(1L);
+        employee.setName("John Doe");
+        employee.setDepartment(dept);
+        employee.setProjects(new HashSet<>(Arrays.asList(project)));
+        
+        project.setEmployees(new HashSet<>(Arrays.asList(employee)));
+
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+
+        List<EmployeeResponseDTO> result = projectService.getEmployeesByProjectId(1L);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("IT", result.get(0).getDepartmentName());
+    }
+
+    @Test
+    public void testMapEmployeeToResponseDTO_Exception() {
+        Employee employee = mock(Employee.class);
+        when(employee.getId()).thenThrow(new RuntimeException("Mapping error"));
+        
+        project.setEmployees(new HashSet<>(Arrays.asList(employee)));
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+
+        assertThrows(RuntimeException.class, () -> projectService.getEmployeesByProjectId(1L));
+    }
+
+    @Test
+    public void testMapToResponseDTO_Exception() {
+        Project mockProject = mock(Project.class);
+        when(mockProject.getId()).thenThrow(new RuntimeException("Mapping error"));
+        
+        when(projectRepository.findById(1L)).thenReturn(Optional.of(mockProject));
+
+        assertThrows(RuntimeException.class, () -> projectService.getProjectById(1L));
+    }
+
+    @Test
+    public void testGetEmployeesByProjectId_ProjectNotFound() {
+        when(projectRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ProjectNotFoundException.class, () -> projectService.getEmployeesByProjectId(1L));
+    }
+
+    @Test
+    public void testGetEmployeesByProjectId_GenericException() {
+        when(projectRepository.findById(1L)).thenThrow(new RuntimeException("Unexpected error"));
+
+        assertThrows(RuntimeException.class, () -> projectService.getEmployeesByProjectId(1L));
+    }
+
+    @Test
+    public void testGetProjectsByEmployeeId_Success() {
+        Employee employee = new Employee();
+        employee.setId(1L);
+        employee.setProjects(new HashSet<>(Arrays.asList(project)));
+
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+
+        List<ProjectResponseDTO> result = projectService.getProjectsByEmployeeId(1L);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Mobile App Development", result.get(0).getName());
+    }
+
+    @Test
+    public void testGetProjectsByEmployeeId_EmployeeNotFound() {
+        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(EmployeeNotFoundException.class, () -> projectService.getProjectsByEmployeeId(1L));
+    }
+
+    @Test
+    public void testGetProjectsByEmployeeId_GenericException() {
+        when(employeeRepository.findById(1L)).thenThrow(new RuntimeException("Unexpected error"));
+
+        assertThrows(RuntimeException.class, () -> projectService.getProjectsByEmployeeId(1L));
     }
 }

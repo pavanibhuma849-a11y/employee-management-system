@@ -67,7 +67,11 @@ public class ProjectController {
         try {
             logger.info("Fetching paginated projects - page: {}, size: {}", page, size);
             Page<ProjectResponseDTO> response = projectService.getAllProjects(PageRequest.of(page, size));
-            logger.info("Projects fetched successfully - total elements: {}", response.getTotalElements());
+            if (response != null) {
+                logger.info("Projects fetched successfully - total elements: {}", response.getTotalElements());
+            } else {
+                logger.warn("Projects fetch returned null response");
+            }
             ApiResponse<Page<ProjectResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Projects fetched successfully");
             return ResponseEntity.ok(apiResponse);
         } catch (Exception ex) {

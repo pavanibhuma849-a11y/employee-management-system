@@ -67,7 +67,11 @@ public class DepartmentController {
         try {
             logger.info("Fetching paginated departments - page: {}, size: {}", page, size);
             Page<DepartmentResponseDTO> response = departmentService.getAllDepartments(PageRequest.of(page, size));
-            logger.info("Departments fetched successfully - total elements: {}", response.getTotalElements());
+            if (response != null) {
+                logger.info("Departments fetched successfully - total elements: {}", response.getTotalElements());
+            } else {
+                logger.warn("Departments fetch returned null response");
+            }
             ApiResponse<Page<DepartmentResponseDTO>> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Departments fetched successfully");
             return ResponseEntity.ok(apiResponse);
         } catch (Exception ex) {

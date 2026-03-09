@@ -181,9 +181,9 @@ public class EmployeeControllerTest {
         mockMvc.perform(get("/employees/sorted")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("Alice Johnson")))
-                .andExpect(jsonPath("$[1].name", is("Bob Smith")));
+                .andExpect(jsonPath("$.data", hasSize(2)))
+                .andExpect(jsonPath("$.data[0].name", is("Alice Johnson")))
+                .andExpect(jsonPath("$.data[1].name", is("Bob Smith")));
 
         verify(employeeService, times(1)).getAllEmployeesSortedByNameAndDate();
     }
@@ -196,7 +196,7 @@ public class EmployeeControllerTest {
         mockMvc.perform(get("/employees/sorted")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.data", hasSize(0)));
 
         verify(employeeService, times(1)).getAllEmployeesSortedByNameAndDate();
     }
@@ -221,9 +221,9 @@ public class EmployeeControllerTest {
         mockMvc.perform(get("/employees/sorted-by-salary")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("Alice Johnson")))
-                .andExpect(jsonPath("$[1].name", is("Bob Smith")));
+                .andExpect(jsonPath("$.data", hasSize(2)))
+                .andExpect(jsonPath("$.data[0].name", is("Alice Johnson")))
+                .andExpect(jsonPath("$.data[1].name", is("Bob Smith")));
 
         verify(employeeService, times(1)).getAllEmployeesSortedBySalary();
     }
