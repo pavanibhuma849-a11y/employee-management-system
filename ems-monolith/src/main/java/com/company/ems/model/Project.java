@@ -8,10 +8,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-public class Project {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Project extends BaseEntity {
 
     private String name;
     private Integer duration;

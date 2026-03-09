@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EmployeeTest {
 
@@ -26,6 +27,21 @@ public class EmployeeTest {
         int result = lowerPaid.compareTo(higherPaid);
 
         assertTrue(result < 0, "Employee with lower salary should be 'less than' higher salary");
+    }
+
+    @Test
+    public void testInheritanceFromBaseEntity() {
+        Employee employee = new Employee();
+        employee.setId(100L);
+        
+        // Check if inherited field 'id' from BaseEntity is accessible
+        assertEquals(100L, employee.getId(), "Employee should inherit 'id' from BaseEntity");
+        
+        // BaseEntity fields like createdAt/updatedAt are normally set by JPA, 
+        // but we can test they exist and are accessible via Lombok getters/setters
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        employee.setCreatedAt(now);
+        assertEquals(now, employee.getCreatedAt(), "Employee should inherit 'createdAt' from BaseEntity");
     }
 }
 

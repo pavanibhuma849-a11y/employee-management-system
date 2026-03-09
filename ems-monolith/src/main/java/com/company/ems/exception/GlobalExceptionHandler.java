@@ -3,8 +3,10 @@ package com.company.ems.exception;
 import com.company.ems.dto.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -43,6 +45,18 @@ public class GlobalExceptionHandler {
         }
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Object>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        try {
+            logger.warn("JSON parse error: {}", ex.getMessage());
+            ApiResponse<Object> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), null, "Invalid data type in request body");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            logger.error("Error handling JSON parse exception: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationException(MethodArgumentNotValidException ex) {
         try {
@@ -75,11 +89,23 @@ public class GlobalExceptionHandler {
         }
     }
 
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDatabaseException(DataAccessException ex, WebRequest request) {
+        try {
+            logger.error("Database error occurred: {}", ex.getMessage(), ex);
+            ApiResponse<Object> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "A database error occurred. Please try again later.");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            logger.error("Error handling database exception: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGlobalException(Exception ex, WebRequest request) {
         try {
             logger.error("Unhandled exception occurred: {} - {}", ex.getClass().getName(), ex.getMessage(), ex);
-            ApiResponse<Object> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, ex.getMessage());
+            ApiResponse<Object> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "An internal server error occurred.");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             logger.error("Error handling global exception: {}", e.getMessage(), e);

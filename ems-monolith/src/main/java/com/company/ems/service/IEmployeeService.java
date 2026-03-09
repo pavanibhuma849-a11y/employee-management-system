@@ -17,4 +17,7 @@ public interface IEmployeeService {
     void deleteEmployee(Long id);
     List<EmployeeResponseDTO> getAllEmployeesSortedByNameAndDate();
     List<EmployeeResponseDTO> getAllEmployeesSortedBySalary();
+    
+    java.util.TreeSet<com.company.ems.model.Employee> getEmployeesInTreeSet();
+    java.util.Map<Long, com.company.ems.model.Employee> getEmployeeMapById();
 }

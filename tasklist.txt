@@ -27,3 +27,22 @@ TC-017	Project	Assign Employee to Project	POST /projects/{id}/employees/{empId}	
 TC-018	Project	Assign Already-Assigned Employee	POST /projects/{id}/employees/{empId} for already-assigned pair	HTTP 409 Conflict or idempotent 200 response	Pass
 TC-019	Project	Get All Employees on a Project	GET /projects/{id}/employees	HTTP 200 OK; list of employees assigned to project	Pass
 TC-020	Project	Remove Employee from Project	DELETE /projects/{id}/employees/{empId}	HTTP 204 No Content; junction record deleted	Pass
+TC-021	Database	One-to-Many: Department to Employees	Insert department, insert multiple employees with same departmentId; query employees by department	All employees correctly linked to department via FK; correct join result returned	Pass
+TC-022	Database	Many-to-Many: Employee-Project Relationship	Assign one employee to multiple projects and one project to multiple employees; query junction table	All associations present in employee_project table	Pass
+TC-023	Database	Cascade Delete Verification	Delete an employee; check employee_project for orphan records	No orphan records remain in junction table after deletion	Pass
+TC-024	Database	Pagination - Large Dataset	GET /employees?page=2&size=10 with 50+ employee records in DB	HTTP 200 OK; exactly 10 records returned for page 2	Pass
+TC-025	Database	Sorting by Salary (Comparable)	GET /employees?sort=salary&order=asc	Employees returned in ascending salary order	Pass
+TC-026	Database	Sorting by Name (Comparator)	GET /employees?sort=name	Employees returned in alphabetical order by name	Pass
+TC-027	Database	SQL Injection Prevention	POST /employees with name field containing SQL injection payload: name = "'; DROP TABLE employee;--"	HTTP 400 or record stored as literal string; table not dropped	Pass
+TC-028	Database	Hibernate Session - Concurrent Writes	Simulate two concurrent POST /employees requests with same data	Both records created with unique IDs; no DB deadlock or error	Pass
+TC-029	Exception Handling	Global Exception Handler Active	Trigger EmployeeNotFoundException by GETting non-existent employee ID	@ControllerAdvice intercepts and returns structured JSON error response	Pass
+TC-030	Exception Handling	Invalid Data Type in Request Body	POST /employees with salary = 'abc' (string instead of number)	HTTP 400 Bad Request; JSON parse/type error message returned	Pass
+TC-031	Exception Handling	Database Connection Failure	Stop DB service; call GET /employees	HTTP 500 Internal Server Error with appropriate error message; no stack trace exposed	Pass
+TC-032	Exception Handling	Empty Request Body on POST	POST /employees with empty body {}	HTTP 400 Bad Request; validation errors listed for all required fields	Pass
+TC-033	Java / OOP	Abstract Base Class Inheritance	Instantiate Employee subclass; verify inherited fields (id, createdAt) are accessible	Inherited fields available; abstract methods overridden correctly	Pass
+TC-034	Java / OOP	Custom EmployeeNotFoundException	Trigger lookup for missing employee; inspect thrown exception type	EmployeeNotFoundException (not generic RuntimeException) is thrown	Pass
+TC-035	Java / OOP	Background Monthly Report Thread	Start application; wait for scheduled report generation (or trigger manually)	Thread runs without blocking main thread; report file generated in /reports directory	Pass
+TC-036	Java / OOP	TreeSet Natural Ordering	Add employees to TreeSet; iterate and verify order	Employees sorted by salary in ascending natural order (Comparable)	Pass
+TC-037	Java / OOP	HashMap Employee Lookup by ID	Populate HashMap<Integer, Employee>; retrieve by key	O(1) lookup returns correct employee object	Pass
+TC-038	Python Analytics	Load Employee Data from CSV	Run analytics.py with a valid employees.csv file path	DataFrame loaded successfully; correct row and column count verified	Pass
+TC-039	Python Analytics	Average Salary per Department	Call calculate_avg_salary() function with sample dataset	Correct average salary computed per department using groupby()	Pass

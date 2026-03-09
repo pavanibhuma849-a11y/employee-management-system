@@ -8,10 +8,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class Department implements Comparable<Department> {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Department extends BaseEntity implements Comparable<Department> {
 
     private String name;
 

@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableDiscoveryClient
+@EnableScheduling
 public class EmsApplication {
     public static void main(String[] args) {
         SpringApplication.run(EmsApplication.class, args);

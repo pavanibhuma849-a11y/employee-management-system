@@ -196,6 +196,35 @@ public class EmployeeServiceImpl implements IEmployeeService {
         }
     }
 
+    @Override
+    public java.util.TreeSet<Employee> getEmployeesInTreeSet() {
+        try {
+            logger.debug("Populating TreeSet with employees for natural ordering");
+            List<Employee> employees = employeeRepository.findAll();
+            java.util.TreeSet<Employee> employeeTreeSet = new java.util.TreeSet<>(employees);
+            logger.info("TreeSet populated with {} employees", employeeTreeSet.size());
+            return employeeTreeSet;
+        } catch (Exception ex) {
+            logger.error("Error populating TreeSet: {}", ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    public java.util.Map<Long, Employee> getEmployeeMapById() {
+        try {
+            logger.debug("Populating HashMap with employees for O(1) lookup");
+            List<Employee> employees = employeeRepository.findAll();
+            java.util.Map<Long, Employee> employeeMap = employees.stream()
+                    .collect(Collectors.toMap(Employee::getId, e -> e, (existing, replacement) -> existing, java.util.HashMap::new));
+            logger.info("HashMap populated with {} employees", employeeMap.size());
+            return employeeMap;
+        } catch (Exception ex) {
+            logger.error("Error populating HashMap: {}", ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
     private Employee mapToEntity(EmployeeRequestDTO dto) {
         try {
             Employee employee = new Employee();

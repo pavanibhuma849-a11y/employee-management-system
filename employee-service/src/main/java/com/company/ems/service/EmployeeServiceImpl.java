@@ -113,19 +113,20 @@ public class EmployeeServiceImpl implements IEmployeeService {
         return employees.stream().map(this::mapToResponseDTO).collect(Collectors.toList());
     }
 
-    public Map<String, Double> getSalaryDistribution() {
-        List<Employee> employees = employeeRepository.findAll();
-        Map<String, Double> distribution = new HashMap<>(); // Requirement 3.1.52: HashMap
-        for (Employee emp : employees) {
-            String dept = emp.getDepartment() != null ? emp.getDepartment().getName() : "Unassigned";
-            distribution.put(dept, distribution.getOrDefault(dept, 0.0) + emp.getSalary());
-        }
-        return distribution;
-    }
-
-    public TreeSet<Employee> getEmployeesSortedBySalary() {
+    @Override
+    public TreeSet<Employee> getEmployeesInTreeSet() {
         // Requirement 3.1.52 & 3.1.53: TreeSet + Natural ordering (Comparable in Employee)
         return new TreeSet<>(employeeRepository.findAll());
+    }
+
+    @Override
+    public Map<Long, Employee> getEmployeeMapById() {
+        List<Employee> employees = employeeRepository.findAll();
+        Map<Long, Employee> employeeMap = new HashMap<>(); // Requirement 3.1.52: HashMap
+        for (Employee emp : employees) {
+            employeeMap.put(emp.getId(), emp);
+        }
+        return employeeMap;
     }
 
     private Employee mapToEntity(EmployeeRequestDTO dto) {
