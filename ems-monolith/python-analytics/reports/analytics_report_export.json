@@ -7,159 +7,143 @@
     },
     "top_performers": [
         {
-            "name": "Employee 19",
-            "performance_score": 98
-        },
-        {
             "name": "Employee 3",
-            "performance_score": 97
-        },
-        {
-            "name": "Employee 21",
-            "performance_score": 96
-        },
-        {
-            "name": "Employee 5",
-            "performance_score": 95
-        },
-        {
-            "name": "Employee 17",
-            "performance_score": 94
+            "performance_score": 99
         },
         {
             "name": "DEmployee 20",
-            "performance_score": 91
+            "performance_score": 99
         },
         {
-            "name": "Employee 16",
-            "performance_score": 90
+            "name": "Employee 2",
+            "performance_score": 97
+        },
+        {
+            "name": "Employee 27",
+            "performance_score": 97
+        },
+        {
+            "name": "Employee 15",
+            "performance_score": 96
+        },
+        {
+            "name": "KHema",
+            "performance_score": 93
+        },
+        {
+            "name": "Employee 25",
+            "performance_score": 92
+        },
+        {
+            "name": "Employee 28",
+            "performance_score": 92
+        },
+        {
+            "name": "Employee 24",
+            "performance_score": 91
         }
     ],
     "attrition_risk": [
         {
-            "name": "Employee 2",
-            "role": "Manager",
-            "performance_score": 73,
-            "years_experience": 16
-        },
-        {
-            "name": "Employee 4",
-            "role": "Manager",
-            "performance_score": 70,
+            "name": "Employee 5",
+            "role": "HR",
+            "performance_score": 76,
             "years_experience": 16
         },
         {
             "name": "Employee 6",
             "role": "IT Support",
-            "performance_score": 74,
+            "performance_score": 79,
             "years_experience": 16
         },
         {
             "name": "Employee 7",
             "role": "IT Support",
-            "performance_score": 76,
+            "performance_score": 71,
             "years_experience": 16
         },
         {
             "name": "Employee 8",
             "role": "Manager",
-            "performance_score": 78,
+            "performance_score": 79,
             "years_experience": 16
         },
         {
             "name": "Employee 9",
             "role": "Manager",
-            "performance_score": 72,
+            "performance_score": 75,
             "years_experience": 16
         },
         {
             "name": "Employee 11",
             "role": "Manager",
-            "performance_score": 75,
+            "performance_score": 81,
             "years_experience": 16
         },
         {
             "name": "Employee 12",
             "role": "Manager",
-            "performance_score": 75,
+            "performance_score": 83,
             "years_experience": 16
         },
         {
             "name": "Employee 13",
             "role": "IT Support",
-            "performance_score": 75,
+            "performance_score": 78,
             "years_experience": 15
         },
         {
-            "name": "Employee 14",
+            "name": "Employee 16",
+            "role": "HR",
+            "performance_score": 83,
+            "years_experience": 15
+        },
+        {
+            "name": "Employee 17",
             "role": "Manager",
-            "performance_score": 77,
+            "performance_score": 84,
             "years_experience": 15
         },
         {
-            "name": "Employee 15",
-            "role": "IT Support",
-            "performance_score": 84,
+            "name": "Employee 19",
+            "role": "Developer",
+            "performance_score": 72,
             "years_experience": 15
         },
         {
             "name": "Employee 22",
             "role": "Developer",
-            "performance_score": 71,
+            "performance_score": 81,
             "years_experience": 15
-        },
-        {
-            "name": "Employee 24",
-            "role": "HR",
-            "performance_score": 77,
-            "years_experience": 15
-        },
-        {
-            "name": "Employee 25",
-            "role": "Manager",
-            "performance_score": 83,
-            "years_experience": 14
         },
         {
             "name": "Employee 26",
             "role": "Designer",
-            "performance_score": 73,
-            "years_experience": 14
-        },
-        {
-            "name": "Employee 27",
-            "role": "HR",
-            "performance_score": 80,
-            "years_experience": 14
-        },
-        {
-            "name": "Employee 28",
-            "role": "IT Support",
-            "performance_score": 70,
+            "performance_score": 71,
             "years_experience": 14
         },
         {
             "name": "Employee 29",
             "role": "HR",
-            "performance_score": 78,
+            "performance_score": 71,
             "years_experience": 14
         },
         {
             "name": "AEmployee 1",
             "role": "Developer",
-            "performance_score": 73,
+            "performance_score": 78,
             "years_experience": 16
         },
         {
             "name": "KHema",
             "role": "Cloud Engineer",
-            "performance_score": 73,
+            "performance_score": 70,
             "years_experience": 8
         },
         {
-            "name": "KHema",
+            "name": "Arjun Patel",
             "role": "Cloud Engineer",
-            "performance_score": 73,
+            "performance_score": 70,
             "years_experience": 8
         }
     ],
@@ -176,7 +160,7 @@
         },
         {
             "name": "Employee 3",
-            "segment": 1
+            "segment": 2
         },
         {
             "name": "Employee 4",
@@ -188,7 +172,7 @@
         },
         {
             "name": "Employee 6",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "Employee 7",
@@ -196,19 +180,19 @@
         },
         {
             "name": "Employee 8",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "Employee 9",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "Employee 11",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "Employee 12",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "Employee 13",
@@ -224,11 +208,11 @@
         },
         {
             "name": "Employee 16",
-            "segment": 1
+            "segment": 2
         },
         {
             "name": "Employee 17",
-            "segment": 1
+            "segment": 2
         },
         {
             "name": "Employee 18",
@@ -240,11 +224,11 @@
         },
         {
             "name": "Employee 21",
-            "segment": 1
+            "segment": 2
         },
         {
             "name": "Employee 22",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "Employee 24",
@@ -256,7 +240,7 @@
         },
         {
             "name": "Employee 26",
-            "segment": 2
+            "segment": 1
         },
         {
             "name": "Employee 27",
@@ -268,15 +252,15 @@
         },
         {
             "name": "Employee 29",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "AEmployee 1",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "Employee 30",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "DEmployee 20",
@@ -292,11 +276,11 @@
         },
         {
             "name": "KHema",
-            "segment": 0
+            "segment": 1
         },
         {
             "name": "Arjun Patel",
-            "segment": 0
+            "segment": 1
         }
     ]
 }

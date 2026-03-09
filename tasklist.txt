@@ -46,3 +46,14 @@ TC-036	Java / OOP	TreeSet Natural Ordering	Add employees to TreeSet; iterate and
 TC-037	Java / OOP	HashMap Employee Lookup by ID	Populate HashMap<Integer, Employee>; retrieve by key	O(1) lookup returns correct employee object	Pass
 TC-038	Python Analytics	Load Employee Data from CSV	Run analytics.py with a valid employees.csv file path	DataFrame loaded successfully; correct row and column count verified	Pass
 TC-039	Python Analytics	Average Salary per Department	Call calculate_avg_salary() function with sample dataset	Correct average salary computed per department using groupby()	Pass
+TC-040	Python Analytics	Top Performers Identification	Call get_top_performers() with performance metric threshold	Employees above threshold returned sorted by performance score	Pass
+TC-041	Python Analytics	Attrition Risk Flag	Run attrition_risk() on dataset with known high-risk employees	High-risk employees flagged correctly based on defined rules/ML model	Pass
+TC-042	Python Analytics	Export Report to CSV	Call export_report('csv') after analytics run	Valid CSV file created in /reports folder with correct columns	Pass
+TC-043	Python Analytics	Export Report to JSON	Call export_report('json') after analytics run	Valid JSON file created; parseable with json.loads()	Pass
+TC-044	Python Analytics	Analytics on Empty Dataset	Run analytics.py with an empty CSV file	Graceful handling; no crash; informative message printed to console	Pass
+TC-045	Python Analytics	Pandas GroupBy Aggregation Accuracy	Use known test dataset; verify groupby sum and mean	Computed values match manually calculated expected values	Pass
+TC-046	Integration	Full Employee Lifecycle E2E	1. POST /employees → 2. GET /employees/{id} → 3. PUT /employees/{id} → 4. DELETE /employees/{id}	All four operations succeed with correct HTTP codes; DB state consistent at each step	Pass
+TC-047	Integration	Employee-Department-Project E2E	Create department → Create employee in department → Create project → Assign employee to project → Query project members	All entities correctly linked; query returns expected employee in project	Pass
+TC-048	Integration	API Response Format Consistency	Call all five /employees endpoints; inspect response bodies	All responses use consistent JSON schema with status, data, and message fields	Pass
+TC-049	Integration	Python Analytics Against Live DB	Point analytics.py to test database; run full analytics pipeline	Data pulled from DB, processed correctly, report matches API-returned data	Pass
+TC-050	Integration	Concurrent API Load Test	Send 50 simultaneous GET /employees requests using Postman Runner or JMeter	All requests return HTTP 200; no server errors; response time < 2s per request	Pass
