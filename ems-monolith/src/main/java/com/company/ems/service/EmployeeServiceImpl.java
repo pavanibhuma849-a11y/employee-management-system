@@ -4,6 +4,7 @@ import com.company.ems.dto.EmployeeRequestDTO;
 import com.company.ems.dto.EmployeeResponseDTO;
 import com.company.ems.dto.EmployeeUpdateRequestDTO;
 import com.company.ems.exception.DepartmentNotFoundException;
+import com.company.ems.exception.DuplicateResourceException;
 import com.company.ems.exception.EmployeeNotFoundException;
 import com.company.ems.exception.ProjectNotFoundException;
 import com.company.ems.model.Department;
@@ -42,6 +43,9 @@ public class EmployeeServiceImpl implements IEmployeeService {
     public EmployeeResponseDTO createEmployee(EmployeeRequestDTO employeeDTO) {
         try {
             logger.debug("Creating employee with name: {}", employeeDTO.getName());
+            if (employeeRepository.existsByName(employeeDTO.getName())) {
+                throw new DuplicateResourceException("Employee already exists with name: " + employeeDTO.getName());
+            }
             Employee employee = mapToEntity(employeeDTO);
             Employee savedEmployee = employeeRepository.save(employee);
             logger.info("Employee created successfully with id: {}", savedEmployee.getId());
@@ -108,7 +112,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
             Employee employee = employeeRepository.findById(id)
                     .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
             
+            if (employeeDTO.getName() != null && !employeeDTO.getName().equals(employee.getName())) {
+                if (employeeRepository.existsByName(employeeDTO.getName())) {
+                    throw new DuplicateResourceException("Employee already exists with name: " + employeeDTO.getName());
+                }
+            }
+            
             employee.setName(employeeDTO.getName());
+            employee.setEmail(employeeDTO.getEmail());
             employee.setRole(employeeDTO.getRole());
             employee.setSalary(employeeDTO.getSalary());
             employee.setJoiningDate(employeeDTO.getJoiningDate());
@@ -229,6 +240,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
         try {
             Employee employee = new Employee();
             employee.setName(dto.getName());
+            employee.setEmail(dto.getEmail());
             employee.setRole(dto.getRole());
             employee.setSalary(dto.getSalary());
             employee.setJoiningDate(dto.getJoiningDate());
@@ -263,6 +275,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
             EmployeeResponseDTO dto = new EmployeeResponseDTO();
             dto.setId(employee.getId());
             dto.setName(employee.getName());
+            dto.setEmail(employee.getEmail());
             dto.setRole(employee.getRole());
             dto.setSalary(employee.getSalary());
             dto.setJoiningDate(employee.getJoiningDate());

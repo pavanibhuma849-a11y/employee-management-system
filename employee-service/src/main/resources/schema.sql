@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS department (
 -- Employee Table
 CREATE TABLE IF NOT EXISTS employee (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
     role VARCHAR(50) NOT NULL,
     salary DECIMAL(10, 2) NOT NULL,
     joining_date DATE NOT NULL,
@@ -18,7 +19,9 @@ CREATE TABLE IF NOT EXISTS employee (
 CREATE TABLE IF NOT EXISTS project (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    duration INT NOT NULL -- duration in months
+    duration INT NOT NULL, -- duration in months
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL
 );
 
 -- Employee_Project Junction Table (Many-to-Many)

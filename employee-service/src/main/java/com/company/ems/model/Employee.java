@@ -11,7 +11,11 @@ import java.util.Set;
 @Setter
 public class Employee extends BaseEntity implements Comparable<Employee> {
 
+    @Column(unique = true, nullable = false)
     private String name;
+    
+    @Column(unique = true, nullable = false)
+    private String email;
     private String role;
     private Double salary;
     private LocalDate joiningDate;

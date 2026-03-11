@@ -45,6 +45,8 @@ public class ProjectServiceImpl implements IProjectService {
             Project project = new Project();
             project.setName(projectDTO.getName());
             project.setDuration(projectDTO.getDuration());
+            project.setStartDate(projectDTO.getStartDate());
+            project.setEndDate(projectDTO.getEndDate());
             Project saved = projectRepository.save(project);
             logger.info("Project created successfully with id: {}", saved.getId());
             return mapToResponseDTO(saved);
@@ -115,6 +117,8 @@ public class ProjectServiceImpl implements IProjectService {
                     .orElseThrow(() -> new ProjectNotFoundException("Project not found with id: " + id));
             project.setName(projectDTO.getName());
             project.setDuration(projectDTO.getDuration());
+            project.setStartDate(projectDTO.getStartDate());
+            project.setEndDate(projectDTO.getEndDate());
             Project updated = projectRepository.save(project);
             logger.info("Project updated successfully with id: {}", id);
             return mapToResponseDTO(updated);
@@ -244,6 +248,8 @@ public class ProjectServiceImpl implements IProjectService {
             dto.setId(project.getId());
             dto.setName(project.getName());
             dto.setDuration(project.getDuration());
+            dto.setStartDate(project.getStartDate());
+            dto.setEndDate(project.getEndDate());
             return dto;
         } catch (Exception ex) {
             logger.error("Error mapping Project to ProjectResponseDTO: {}", ex.getMessage(), ex);
