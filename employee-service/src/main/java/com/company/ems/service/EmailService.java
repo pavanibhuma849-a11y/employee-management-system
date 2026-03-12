@@ -37,24 +37,37 @@ public class EmailService {
 
             String content = String.format(
                 "<html>" +
-                "<body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>" +
-                "<div style='max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;'>" +
-                "  <h2 style='color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 10px;'>Project Assignment Notification</h2>" +
-                "  <p>Dear <strong>%s</strong>,</p>" +
-                "  <p>We are pleased to inform you that you have been assigned to the project <strong>%s</strong>. " +
-                "  Your role in this project will begin from <strong>%s</strong> and is expected to continue until <strong>%s</strong>.</p>" +
-                "  <div style='background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 5px solid #2c3e50;'>" +
-                "    <h3 style='margin-top: 0; color: #2c3e50;'>Project Details:</h3>" +
-                "    <p style='margin: 5px 0;'><strong>Project Name:</strong> %s</p>" +
-                "    <p style='margin: 5px 0;'><strong>Start Date:</strong> %s</p>" +
-                "    <p style='margin: 5px 0;'><strong>End Date:</strong> %s</p>" +
+                "<body style='background-color: #f4f7f6; font-family: Arial, sans-serif; margin: 0; padding: 20px;'>" +
+                "  <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);'>" +
+                "    <div style='background-color: #243e60; color: #ffffff; padding: 25px; text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 2px;'>" +
+                "      EMS" +
+                "    </div>" +
+                "    <div style='padding: 35px; color: #333333; line-height: 1.6;'>" +
+                "      <h2 style='color: #243e60; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px;'>Project Assignment Notification</h2>" +
+                "      <p>Dear <strong>%s</strong>,</p>" +
+                "      <p>We are pleased to inform you that you have been assigned to the project <strong>%s</strong>. " +
+                "      Your role in this project will begin from <strong>%s</strong> and is expected to continue until <strong>%s</strong>.</p>" +
+                "      " +
+                "      <div style='background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 25px; margin: 25px 0; border-left: 5px solid #243e60;'>" +
+                "        <h3 style='margin-top: 0; color: #243e60;'>Project Details:</h3>" +
+                "        <p style='margin: 10px 0;'><strong>Project Name:</strong> %s</p>" +
+                "        <p style='margin: 10px 0;'><strong>Start Date:</strong> %s</p>" +
+                "        <p style='margin: 10px 0;'><strong>End Date:</strong> %s</p>" +
+                "      </div>" +
+                "" +
+                "      <p>Kindly review the project requirements and ensure timely completion of your assigned tasks. " +
+                "      If you have any questions or require further clarification, please feel free to reach out.</p>" +
+                "      <p>We wish you the best in successfully contributing to this project.</p>" +
+                "      " +
+                "      <p style='margin-top: 35px; border-top: 1px solid #eee; padding-top: 20px;'>" +
+                "        Best Regards,<br>" +
+                "        <strong>Employee Management System</strong>" +
+                "      </p>" +
+                "    </div>" +
+                "    <div style='background-color: #f8f9fa; color: #777777; padding: 20px; text-align: center; font-size: 12px; border-top: 1px solid #eeeeee;'>" +
+                "      © 2026 EMS Platform. All rights reserved." +
+                "    </div>" +
                 "  </div>" +
-                "  <p>Kindly review the project requirements and ensure timely completion of your assigned tasks. " +
-                "  If you have any questions or require further clarification, please feel free to reach out.</p>" +
-                "  <p>We wish you the best in successfully contributing to this project.</p>" +
-                "  <hr style='border: 0; border-top: 1px solid #ddd; margin: 20px 0;'>" +
-                "  <p style='font-size: 0.9em; color: #7f8c8d;'>Best Regards,<br><strong>Employee Management System</strong></p>" +
-                "</div>" +
                 "</body>" +
                 "</html>",
                 employeeName, projectName, startDate, endDate, projectName, startDate, endDate
