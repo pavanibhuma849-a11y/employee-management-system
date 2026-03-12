@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 public class Department extends BaseEntity {
 
+    @Column(unique = true, nullable = false)
     private String name;
 
     @OneToMany(mappedBy = "department")

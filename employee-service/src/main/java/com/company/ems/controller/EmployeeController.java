@@ -82,6 +82,15 @@ public class EmployeeController {
         ApiResponse<Void> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), null, "employee remove from database succesfully");
         return ResponseEntity.ok(apiResponse);
     }
+
+    @PostMapping("/{employeeId}/projects/{projectId}")
+    public ResponseEntity<ApiResponse<EmployeeResponseDTO>> assignProjectToEmployee(
+            @PathVariable Long employeeId,
+            @PathVariable Long projectId) {
+        EmployeeResponseDTO response = employeeService.assignProjectToEmployee(employeeId, projectId);
+        ApiResponse<EmployeeResponseDTO> apiResponse = new ApiResponse<>(HttpStatus.OK.value(), response, "Project assigned to employee successfully");
+        return ResponseEntity.ok(apiResponse);
+    }
 }
 
 

@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 public interface IEmployeeService {
     EmployeeResponseDTO createEmployee(EmployeeRequestDTO employeeDTO);
@@ -17,6 +19,7 @@ public interface IEmployeeService {
     void deleteEmployee(Long id);
     List<EmployeeResponseDTO> getAllEmployeesSortedByNameAndDate();
     
-    java.util.TreeSet<com.company.ems.model.Employee> getEmployeesInTreeSet();
-    java.util.Map<Long, com.company.ems.model.Employee> getEmployeeMapById();
+    TreeSet<com.company.ems.model.Employee> getEmployeesInTreeSet();
+    Map<Long, com.company.ems.model.Employee> getEmployeeMapById();
+    EmployeeResponseDTO assignProjectToEmployee(Long employeeId, Long projectId);
 }

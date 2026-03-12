@@ -28,7 +28,8 @@ public class Employee extends BaseEntity implements Comparable<Employee> {
     @JoinTable(
         name = "employee_project",
         joinColumns = @JoinColumn(name = "employee_id"),
-        inverseJoinColumns = @JoinColumn(name = "project_id")
+        inverseJoinColumns = @JoinColumn(name = "project_id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"employee_id", "project_id"})
     )
     private Set<Project> projects;
 

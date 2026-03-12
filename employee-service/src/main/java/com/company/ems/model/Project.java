@@ -11,6 +11,7 @@ import java.util.Set;
 @Setter
 public class Project extends BaseEntity {
 
+    @Column(unique = true, nullable = false)
     private String name;
     private Integer duration;
     private LocalDate startDate;

@@ -203,6 +203,28 @@ public class EmployeeServiceImpl implements IEmployeeService {
         return employeeMap;
     }
 
+    @Override
+    public EmployeeResponseDTO assignProjectToEmployee(Long employeeId, Long projectId) {
+        try {
+            logger.debug("Assigning project {} to employee {}", projectId, employeeId);
+            Employee employee = employeeRepository.findById(employeeId)
+                    .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + employeeId));
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new ProjectNotFoundException("Project not found with id: " + projectId));
+            
+            employee.getProjects().add(project);
+            Employee updatedEmployee = employeeRepository.save(employee);
+            logger.info("Project {} assigned to employee {} successfully", projectId, employeeId);
+            return mapToResponseDTO(updatedEmployee);
+        } catch (EmployeeNotFoundException | ProjectNotFoundException ex) {
+            logger.warn(ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error assigning project {} to employee {}: {}", projectId, employeeId, ex.getMessage(), ex);
+            throw ex;
+        }
+    }
+
     private Employee mapToEntity(EmployeeRequestDTO dto) {
         Employee employee = new Employee();
         employee.setName(dto.getName());

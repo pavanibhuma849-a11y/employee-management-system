@@ -12,6 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,6 +40,8 @@ public class ProjectControllerTest {
         requestDTO = new ProjectRequestDTO();
         requestDTO.setName("Project Alpha");
         requestDTO.setDuration(6);
+        requestDTO.setStartDate(LocalDate.now());
+        requestDTO.setEndDate(LocalDate.now().plusMonths(6));
 
         responseDTO = new ProjectResponseDTO();
         responseDTO.setId(1L);

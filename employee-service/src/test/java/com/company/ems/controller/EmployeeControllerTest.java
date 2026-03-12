@@ -39,6 +39,7 @@ public class EmployeeControllerTest {
     public void setUp() {
         employeeRequestDTO = new EmployeeRequestDTO();
         employeeRequestDTO.setName("John Doe");
+        employeeRequestDTO.setEmail("john.doe@company.com");
         employeeRequestDTO.setRole("Software Engineer");
         employeeRequestDTO.setSalary(75000.0);
         employeeRequestDTO.setJoiningDate(LocalDate.of(2022, 1, 15));
@@ -54,6 +55,7 @@ public class EmployeeControllerTest {
     public void testCreateEmployee_SqlInjectionPrevention() throws Exception {
         EmployeeRequestDTO sqlInjectionRequest = new EmployeeRequestDTO();
         sqlInjectionRequest.setName("'; DROP TABLE employee;--");
+        sqlInjectionRequest.setEmail("attacker@evil.com");
         sqlInjectionRequest.setRole("Attacker");
         sqlInjectionRequest.setSalary(1000.0);
         sqlInjectionRequest.setJoiningDate(LocalDate.now());
