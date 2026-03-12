@@ -46,6 +46,9 @@ public class EmployeeServiceImplTest {
     @Mock
     private ProjectRepository projectRepository;
 
+    @Mock
+    private EmailService emailService;
+
     @InjectMocks
     private EmployeeServiceImpl employeeService;
 
@@ -62,10 +65,13 @@ public class EmployeeServiceImplTest {
         project = new Project();
         project.setId(20L);
         project.setName("AI Platform");
+        project.setStartDate(LocalDate.now());
+        project.setEndDate(LocalDate.now().plusMonths(6));
 
         employee = new Employee();
         employee.setId(1L);
         employee.setName("John Doe");
+        employee.setEmail("john.doe@company.com");
         employee.setRole("Developer");
         employee.setSalary(50000.0);
         employee.setJoiningDate(LocalDate.now());
@@ -89,6 +95,7 @@ public class EmployeeServiceImplTest {
         assertEquals(1L, result.getId());
         assertEquals("John Doe", result.getName());
         verify(employeeRepository).save(any(Employee.class));
+        verify(emailService, times(1)).sendProjectAssignmentEmail(anyString(), anyString(), anyString(), any(LocalDate.class), any(LocalDate.class));
     }
 
     @Test

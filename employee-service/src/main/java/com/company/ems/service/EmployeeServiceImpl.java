@@ -54,6 +54,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
             }
             Employee employee = mapToEntity(employeeDTO);
             Employee savedEmployee = employeeRepository.save(employee);
+            
+            // Send email notification for each assigned project
+            if (savedEmployee.getProjects() != null && !savedEmployee.getProjects().isEmpty()) {
+                savedEmployee.getProjects().forEach(project -> 
+                    emailService.sendProjectAssignmentEmail(savedEmployee.getEmail(), savedEmployee.getName(), project.getName(), project.getStartDate(), project.getEndDate())
+                );
+            }
+            
             logger.info("Employee created successfully with id: {}", savedEmployee.getId());
             return mapToResponseDTO(savedEmployee);
         } catch (Exception ex) {
@@ -225,7 +233,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
             Employee savedEmployee = employeeRepository.save(employee);
             
             // Send email notification
-            emailService.sendProjectAssignmentEmail(savedEmployee.getEmail(), savedEmployee.getName(), project.getName());
+            emailService.sendProjectAssignmentEmail(savedEmployee.getEmail(), savedEmployee.getName(), project.getName(), project.getStartDate(), project.getEndDate());
             
             logger.info("Project {} assigned to employee {} successfully", projectId, employeeId);
             return mapToResponseDTO(savedEmployee);

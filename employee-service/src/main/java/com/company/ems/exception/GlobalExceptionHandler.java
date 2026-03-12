@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -19,8 +20,8 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({EmployeeNotFoundException.class, DepartmentNotFoundException.class, ProjectNotFoundException.class})
-    public ResponseEntity<ApiResponse<Object>> handleNotFoundException(RuntimeException ex, WebRequest request) {
+    @ExceptionHandler({EmployeeNotFoundException.class, DepartmentNotFoundException.class, ProjectNotFoundException.class, NoResourceFoundException.class})
+    public ResponseEntity<ApiResponse<Object>> handleNotFoundException(Exception ex, WebRequest request) {
         logger.warn("Resource not found: {}", ex.getMessage());
         ApiResponse<Object> response = new ApiResponse<>(HttpStatus.NOT_FOUND.value(), null, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
