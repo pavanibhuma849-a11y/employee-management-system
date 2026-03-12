@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,6 +51,8 @@ public class ProjectControllerTest {
         projectRequestDTO = new ProjectRequestDTO();
         projectRequestDTO.setName("Mobile App Development");
         projectRequestDTO.setDuration(6);
+        projectRequestDTO.setStartDate(LocalDate.now());
+        projectRequestDTO.setEndDate(LocalDate.now().plusMonths(6));
 
         projectResponseDTO = new ProjectResponseDTO();
         projectResponseDTO.setId(1L);
@@ -78,6 +81,8 @@ public class ProjectControllerTest {
         ProjectRequestDTO webRequest = new ProjectRequestDTO();
         webRequest.setName("Web Application");
         webRequest.setDuration(12);
+        webRequest.setStartDate(LocalDate.now());
+        webRequest.setEndDate(LocalDate.now().plusMonths(12));
 
         ProjectResponseDTO webResponse = new ProjectResponseDTO();
         webResponse.setId(2L);
@@ -103,6 +108,8 @@ public class ProjectControllerTest {
         ProjectRequestDTO shortRequest = new ProjectRequestDTO();
         shortRequest.setName("Bug Fix");
         shortRequest.setDuration(1);
+        shortRequest.setStartDate(LocalDate.now());
+        shortRequest.setEndDate(LocalDate.now().plusMonths(1));
 
         ProjectResponseDTO shortResponse = new ProjectResponseDTO();
         shortResponse.setId(3L);
@@ -349,6 +356,8 @@ public class ProjectControllerTest {
         ProjectRequestDTO longNameRequest = new ProjectRequestDTO();
         longNameRequest.setName("Very Long Project Name For Testing Purpose");
         longNameRequest.setDuration(5);
+        longNameRequest.setStartDate(LocalDate.now());
+        longNameRequest.setEndDate(LocalDate.now().plusMonths(5));
 
         ProjectResponseDTO longNameResponse = new ProjectResponseDTO();
         longNameResponse.setId(6L);

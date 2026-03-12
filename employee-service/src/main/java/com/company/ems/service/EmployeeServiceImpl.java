@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,6 +41,9 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public EmployeeResponseDTO createEmployee(EmployeeRequestDTO employeeDTO) {
@@ -204,6 +208,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     }
 
     @Override
+    @Transactional
     public EmployeeResponseDTO assignProjectToEmployee(Long employeeId, Long projectId) {
         try {
             logger.debug("Assigning project {} to employee {}", projectId, employeeId);
@@ -212,10 +217,18 @@ public class EmployeeServiceImpl implements IEmployeeService {
             Project project = projectRepository.findById(projectId)
                     .orElseThrow(() -> new ProjectNotFoundException("Project not found with id: " + projectId));
             
+            if (employee.getProjects().contains(project)) {
+                return mapToResponseDTO(employee);
+            }
+
             employee.getProjects().add(project);
-            Employee updatedEmployee = employeeRepository.save(employee);
+            Employee savedEmployee = employeeRepository.save(employee);
+            
+            // Send email notification
+            emailService.sendProjectAssignmentEmail(savedEmployee.getEmail(), savedEmployee.getName(), project.getName());
+            
             logger.info("Project {} assigned to employee {} successfully", projectId, employeeId);
-            return mapToResponseDTO(updatedEmployee);
+            return mapToResponseDTO(savedEmployee);
         } catch (EmployeeNotFoundException | ProjectNotFoundException ex) {
             logger.warn(ex.getMessage());
             throw ex;
